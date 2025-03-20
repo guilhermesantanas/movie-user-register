@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Film, UserPlus, ArrowRight } from 'lucide-react';
+import { Film, UserPlus, ArrowRight, LogIn, Eye } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
 import NavLink from '@/components/NavLink';
 import AppHeader from '@/components/AppHeader';
@@ -30,6 +30,22 @@ const Index = () => {
             initial="hidden"
             animate="show"
           >
+            <NavLink 
+              to="/login" 
+              icon={<LogIn size={18} />}
+              className="hover:border-blue-100"
+            >
+              Login to Admin Panel
+            </NavLink>
+            
+            <NavLink 
+              to="/movies" 
+              icon={<Eye size={18} />}
+              className="hover:border-blue-100"
+            >
+              Browse Movies
+            </NavLink>
+            
             <NavLink 
               to="/register-user" 
               icon={<UserPlus size={18} />}

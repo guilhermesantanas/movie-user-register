@@ -8,6 +8,8 @@ import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import UserRegistration from "./pages/UserRegistration";
 import MovieRegistration from "./pages/MovieRegistration";
+import Movies from "./pages/Movies";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/register-user" element={<UserRegistration />} />
             <Route path="/register-movie" element={<MovieRegistration />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
