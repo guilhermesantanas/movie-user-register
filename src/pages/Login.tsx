@@ -10,7 +10,7 @@ import AppHeader from '@/components/AppHeader';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';
 
-// Admin credentials - in a real app, these would be stored securely
+// Admin credentials
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "admin123";
 
@@ -26,16 +26,36 @@ const Login = () => {
     
     // Simple login validation
     setTimeout(() => {
+      // First check if it's the admin
       if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
         // Store login state in localStorage
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
+        localStorage.setItem('userType', 'admin');
+        
+        toast.success('Login successful as Admin!');
+        navigate('/movies');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // If not admin, check registered users
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const user = users.find((u: any) => 
+        (u.name === username || u.email === username) && u.password === password
+      );
+      
+      if (user) {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', user.name);
+        localStorage.setItem('userType', user.userType);
         
         toast.success('Login successful!');
         navigate('/movies');
       } else {
         toast.error('Invalid credentials');
       }
+      
       setIsSubmitting(false);
     }, 1000);
   };
@@ -66,10 +86,10 @@ const Login = () => {
           >
             <form onSubmit={handleSubmit}>
               <InputField
-                label="Username"
+                label="Username or Email"
                 id="username"
                 name="username"
-                placeholder="Enter your username"
+                placeholder="Enter your username or email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -99,6 +119,10 @@ const Login = () => {
                 </Button>
                 
                 <p className="text-center text-sm text-muted-foreground mt-4">
+                  Don't have an account? <a href="/register-user" className="text-primary hover:underline">Register here</a>
+                </p>
+                
+                <p className="text-center text-sm text-muted-foreground mt-2">
                   Admin credentials: admin / admin123
                 </p>
               </div>

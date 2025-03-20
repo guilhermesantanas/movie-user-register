@@ -11,6 +11,7 @@ import MovieRegistration from "./pages/MovieRegistration";
 import Movies from "./pages/Movies";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/register-user" element={<UserRegistration />} />
-            <Route path="/register-movie" element={<MovieRegistration />} />
+            <Route 
+              path="/register-movie" 
+              element={
+                <ProtectedRoute>
+                  <MovieRegistration />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/movies" element={<Movies />} />
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />

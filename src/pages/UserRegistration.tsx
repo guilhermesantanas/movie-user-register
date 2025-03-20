@@ -19,10 +19,33 @@ const UserRegistration = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Get form data
+    const formData = new FormData(e.target as HTMLFormElement);
+    const userData = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      password: formData.get('password'),
+      dob: formData.get('dob'),
+      userType: formData.get('userType'),
+      city: formData.get('city'),
+      country: formData.get('country')
+    };
+    
+    // Simulate form submission - in a real app, you'd save to a database
     setTimeout(() => {
+      // Save to localStorage for demo purposes
+      const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      savedUsers.push(userData);
+      localStorage.setItem('users', JSON.stringify(savedUsers));
+      
       setIsSubmitting(false);
       toast.success('User registered successfully!');
+      
+      // Automatically log in the new user
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('username', userData.name as string);
+      
       navigate('/');
     }, 1500);
   };

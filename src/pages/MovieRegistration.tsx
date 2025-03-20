@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Film, Calendar, Clock, Tag, Users, ArrowLeft, Info, Star, Globe } from 'lucide-react';
+import { Film, Calendar, Clock, Tag, Users, ArrowLeft, Info, Star, Globe, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 import PageTransition from '@/components/PageTransition';
@@ -15,16 +15,46 @@ import Button from '@/components/Button';
 const MovieRegistration = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registeredBy, setRegisteredBy] = useState('');
+  
+  useEffect(() => {
+    // Get the username from localStorage
+    const username = localStorage.getItem('username');
+    if (username) {
+      setRegisteredBy(username);
+    }
+  }, []);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Get form data
+    const formData = new FormData(e.target as HTMLFormElement);
+    const movieData = {
+      title: formData.get('title'),
+      releaseDate: formData.get('releaseDate'),
+      duration: formData.get('duration'),
+      genre: formData.get('genre'),
+      rating: formData.get('rating'),
+      director: formData.get('director'),
+      imdbRating: formData.get('imdbRating'),
+      synopsis: formData.get('synopsis'),
+      language: formData.get('language'),
+      posterUrl: formData.get('posterUrl'),
+      registeredBy
+    };
+    
+    // Simulate form submission - in a real app, you'd save to a database
     setTimeout(() => {
+      // Save to localStorage for demo purposes
+      const savedMovies = JSON.parse(localStorage.getItem('movies') || '[]');
+      savedMovies.push(movieData);
+      localStorage.setItem('movies', JSON.stringify(savedMovies));
+      
       setIsSubmitting(false);
       toast.success('Movie registered successfully!');
-      navigate('/');
+      navigate('/movies');
     }, 1500);
   };
   
@@ -169,6 +199,16 @@ const MovieRegistration = () => {
                   icon={<Info size={18} />}
                 />
               </div>
+              
+              <InputField
+                label="Registered By"
+                id="registeredBy"
+                name="registeredBy"
+                value={registeredBy}
+                readOnly
+                className="bg-gray-50"
+                icon={<User size={18} />}
+              />
               
               <div className="mt-6">
                 <Button 
