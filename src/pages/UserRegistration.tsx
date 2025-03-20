@@ -64,8 +64,8 @@ const UserRegistration = () => {
           </Button>
           
           <AppHeader 
-            title="User Registration" 
-            subtitle="Create a new user account"
+            title="Cinema Management" 
+            subtitle="register account"
           />
           
           <motion.div 
