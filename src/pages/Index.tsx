@@ -1,13 +1,63 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Film, UserPlus, ArrowRight } from 'lucide-react';
+import PageTransition from '@/components/PageTransition';
+import NavLink from '@/components/NavLink';
+import AppHeader from '@/components/AppHeader';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <PageTransition>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <AppHeader 
+            title="Cinema Management" 
+            subtitle="Register users and movies with ease"
+          />
+          
+          <motion.div 
+            className="space-y-4"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            animate="show"
+          >
+            <NavLink 
+              to="/register-user" 
+              icon={<UserPlus size={18} />}
+              className="hover:border-blue-100"
+            >
+              Register New User
+            </NavLink>
+            
+            <NavLink 
+              to="/register-movie" 
+              icon={<Film size={18} />}
+              className="hover:border-blue-100"
+            >
+              Register New Movie
+            </NavLink>
+          </motion.div>
+          
+          <motion.p 
+            className="text-center text-sm text-muted-foreground mt-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            Select an option to get started
+          </motion.p>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 
