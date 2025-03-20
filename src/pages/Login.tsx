@@ -75,7 +75,7 @@ const Login = () => {
           
           <AppHeader 
             title="Cinema Management" 
-            subtitle="Login to your account"
+            subtitle="login"
           />
           
           <motion.div 
