@@ -7,44 +7,44 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    --background: 240 10% 10%;
+    --foreground: 0 0% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 240 10% 15%;
+    --card-foreground: 0 0% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 240 10% 15%;
+    --popover-foreground: 0 0% 90%;
 
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 240 5% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 240 5% 20%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 240 5% 20%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 240 5% 25%;
+    --accent-foreground: 0 0% 90%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 90%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 84% 5%;
+    --border: 240 5% 25%;
+    --input: 240 5% 25%;
+    --ring: 240 5% 65%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5% 26%;
-    --sidebar-primary: 240 6% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 240 10% 8%;
+    --sidebar-foreground: 240 5% 75%;
+    --sidebar-primary: 240 5% 65%;
+    --sidebar-primary-foreground: 240 10% 8%;
+    --sidebar-accent: 240 5% 20%;
+    --sidebar-accent-foreground: 240 5% 75%;
+    --sidebar-border: 240 5% 20%;
+    --sidebar-ring: 240 5% 65%;
   }
 
   .dark {
@@ -111,15 +111,15 @@
 @layer components {
   .input-field {
     @apply transition-all duration-300 ease-in-out;
-    @apply bg-white bg-opacity-50 backdrop-blur-md;
-    @apply border border-gray-200 rounded-xl px-4 py-3;
+    @apply bg-secondary bg-opacity-80 backdrop-blur-md;
+    @apply border border-border rounded-xl px-4 py-3;
     @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30;
-    @apply placeholder:text-gray-400;
+    @apply placeholder:text-muted-foreground;
     @apply w-full;
   }
   
   .btn-primary {
-    @apply bg-primary text-white rounded-xl px-6 py-3;
+    @apply bg-primary text-primary-foreground rounded-xl px-6 py-3;
     @apply transition-all duration-300 ease-in-out;
     @apply hover:brightness-105 active:brightness-95;
     @apply focus:outline-none focus:ring-2 focus:ring-primary/20;
@@ -128,15 +128,15 @@
   }
   
   .card {
-    @apply bg-white bg-opacity-80 backdrop-blur-md;
-    @apply border border-gray-200 rounded-2xl;
+    @apply bg-card bg-opacity-80 backdrop-blur-md;
+    @apply border border-border rounded-2xl;
     @apply shadow-sm;
     @apply transition-all duration-300 ease-in-out;
   }
   
   .tag {
     @apply inline-flex items-center;
-    @apply bg-gray-100 text-gray-800 text-xs font-medium;
+    @apply bg-secondary text-secondary-foreground text-xs font-medium;
     @apply px-2.5 py-1 rounded-full;
   }
 }
