@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -64,30 +65,32 @@ const Movies = () => {
     <PageTransition>
       <div className="min-h-screen py-12 px-6">
         <div className="w-full max-w-6xl mx-auto">
-          <Button 
-            variant="outline" 
-            className="mb-6" 
-            onClick={() => navigate('/')}
-            icon={<ArrowLeft size={16} />}
-          >
-            Back to Home
-          </Button>
-          
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <AppHeader 
-              title="Movie Collection" 
-              subtitle="Browse our movie database"
-              className="mb-0"
-            />
+            <div>
+              <Button 
+                variant="outline" 
+                className="mb-4" 
+                onClick={() => navigate('/')}
+                icon={<ArrowLeft size={16} />}
+              >
+                Back to Home
+              </Button>
+              
+              <AppHeader 
+                title="Movie Collection" 
+                subtitle="Browse our movie database"
+                className="mb-0"
+              />
+            </div>
             
-            {isLoggedIn && (
+            <div className="flex gap-3">
               <Button 
                 onClick={handleAddMovie}
                 icon={<Plus size={18} />}
               >
-                Add Movie
+                Register New Movie
               </Button>
-            )}
+            </div>
           </div>
           
           <div className="mb-8 max-w-md">
