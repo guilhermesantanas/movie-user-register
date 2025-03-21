@@ -5,20 +5,25 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Film, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { supabase } from '@/integrations/supabase/client';
 import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
 import InputField from '@/components/InputField';
 
 interface Movie {
+  id: string;
   title: string;
-  releaseDate: string;
-  duration: string;
+  release_date: string;
+  duration: number;
   genre: string;
   director: string;
   synopsis: string;
-  posterUrl?: string;
-  registeredBy?: string;
+  poster_url?: string;
+  registered_by?: string;
+  imdb_rating?: number;
+  language?: string;
+  rating?: string;
 }
 
 const Movies = () => {
@@ -26,13 +31,34 @@ const Movies = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   
   useEffect(() => {
-    // Load movies from localStorage
-    const savedMovies = JSON.parse(localStorage.getItem('movies') || '[]');
-    setMovies(savedMovies);
-    setFilteredMovies(savedMovies);
+    const fetchMovies = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('movies')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+          throw error;
+        }
+        
+        setMovies(data || []);
+        setFilteredMovies(data || []);
+        console.log('Movies loaded from Supabase:', data);
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+        toast.error('Failed to load movies. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchMovies();
   }, []);
   
   useEffect(() => {
@@ -40,9 +66,9 @@ const Movies = () => {
       setFilteredMovies(movies);
     } else {
       const filtered = movies.filter(movie => 
-        movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        movie.director.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        movie.genre.toLowerCase().includes(searchTerm.toLowerCase())
+        movie.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        movie.director?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        movie.genre?.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredMovies(filtered);
     }
@@ -106,7 +132,11 @@ const Movies = () => {
             />
           </div>
           
-          {filteredMovies.length === 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+            </div>
+          ) : filteredMovies.length === 0 ? (
             <motion.div 
               className="text-center p-12 border border-dashed rounded-lg"
               initial={{ opacity: 0 }}
@@ -145,8 +175,8 @@ const Movies = () => {
               initial="hidden"
               animate="show"
             >
-              {filteredMovies.map((movie, index) => (
-                <MovieCard key={index} movie={movie} />
+              {filteredMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
               ))}
             </motion.div>
           )}
@@ -166,9 +196,9 @@ const MovieCard = ({ movie }: { movie: Movie }) => {
       }}
     >
       <div className="aspect-[2/3] bg-muted relative overflow-hidden">
-        {movie.posterUrl ? (
+        {movie.poster_url ? (
           <img 
-            src={movie.posterUrl} 
+            src={movie.poster_url} 
             alt={movie.title} 
             className="w-full h-full object-cover"
           />
@@ -181,7 +211,7 @@ const MovieCard = ({ movie }: { movie: Movie }) => {
       <div className="p-4">
         <h3 className="font-bold text-lg mb-1">{movie.title}</h3>
         <div className="flex items-center text-sm text-muted-foreground mb-2">
-          <span>{movie.releaseDate?.split('-')[0]}</span>
+          <span>{movie.release_date?.split('-')[0]}</span>
           <span className="mx-2">•</span>
           <span>{movie.duration} min</span>
           <span className="mx-2">•</span>
@@ -193,9 +223,9 @@ const MovieCard = ({ movie }: { movie: Movie }) => {
         <p className="text-sm line-clamp-3">
           {movie.synopsis}
         </p>
-        {movie.registeredBy && (
+        {movie.registered_by && (
           <p className="text-xs text-muted-foreground mt-3">
-            Added by: {movie.registeredBy}
+            Added by: {movie.registered_by}
           </p>
         )}
       </div>

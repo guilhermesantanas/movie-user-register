@@ -84,6 +84,54 @@ export type Database = {
           },
         ]
       }
+      movies: {
+        Row: {
+          created_at: string
+          director: string | null
+          duration: number | null
+          genre: string | null
+          id: string
+          imdb_rating: number | null
+          language: string | null
+          poster_url: string | null
+          rating: string | null
+          registered_by: string | null
+          release_date: string | null
+          synopsis: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          director?: string | null
+          duration?: number | null
+          genre?: string | null
+          id?: string
+          imdb_rating?: number | null
+          language?: string | null
+          poster_url?: string | null
+          rating?: string | null
+          registered_by?: string | null
+          release_date?: string | null
+          synopsis?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          director?: string | null
+          duration?: number | null
+          genre?: string | null
+          id?: string
+          imdb_rating?: number | null
+          language?: string | null
+          poster_url?: string | null
+          rating?: string | null
+          registered_by?: string | null
+          release_date?: string | null
+          synopsis?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       streaming: {
         Row: {
           disponibilidade: boolean

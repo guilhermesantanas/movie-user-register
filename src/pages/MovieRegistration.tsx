@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Film, Calendar, Clock, Tag, Users, ArrowLeft, Info, Star, Globe, User } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { supabase } from '@/integrations/supabase/client';
 import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import InputField from '@/components/InputField';
@@ -25,37 +26,44 @@ const MovieRegistration = () => {
     }
   }, []);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     // Get form data
     const formData = new FormData(e.target as HTMLFormElement);
+    
     const movieData = {
-      title: formData.get('title'),
-      releaseDate: formData.get('releaseDate'),
-      duration: formData.get('duration'),
-      genre: formData.get('genre'),
-      rating: formData.get('rating'),
-      director: formData.get('director'),
-      imdbRating: formData.get('imdbRating'),
-      synopsis: formData.get('synopsis'),
-      language: formData.get('language'),
-      posterUrl: formData.get('posterUrl'),
-      registeredBy
+      title: formData.get('title') as string,
+      release_date: formData.get('releaseDate') as string,
+      duration: parseInt(formData.get('duration') as string),
+      genre: formData.get('genre') as string,
+      rating: formData.get('rating') as string,
+      director: formData.get('director') as string,
+      imdb_rating: parseFloat(formData.get('imdbRating') as string),
+      synopsis: formData.get('synopsis') as string,
+      language: formData.get('language') as string,
+      poster_url: formData.get('posterUrl') as string,
+      registered_by: registeredBy
     };
     
-    // Simulate form submission - in a real app, you'd save to a database
-    setTimeout(() => {
-      // Save to localStorage for demo purposes
-      const savedMovies = JSON.parse(localStorage.getItem('movies') || '[]');
-      savedMovies.push(movieData);
-      localStorage.setItem('movies', JSON.stringify(savedMovies));
+    try {
+      const { error } = await supabase
+        .from('movies')
+        .insert([movieData]);
       
-      setIsSubmitting(false);
+      if (error) {
+        throw error;
+      }
+      
       toast.success('Movie registered successfully!');
       navigate('/movies');
-    }, 1500);
+    } catch (error) {
+      console.error('Error registering movie:', error);
+      toast.error('Failed to register movie. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -65,10 +73,10 @@ const MovieRegistration = () => {
           <Button 
             variant="outline" 
             className="mb-6" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/movies')}
             icon={<ArrowLeft size={16} />}
           >
-            Back to Home
+            Back to Movies
           </Button>
           
           <AppHeader 
