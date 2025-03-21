@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -25,12 +26,95 @@ interface Movie {
   rating?: string;
 }
 
+// Sample movie data to show when database is empty
+const sampleMovies: Movie[] = [
+  {
+    id: 'sample-1',
+    title: 'The Shawshank Redemption',
+    release_date: '1994-09-23',
+    duration: 142,
+    genre: 'drama',
+    director: 'Frank Darabont',
+    synopsis: 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg',
+    imdb_rating: 9.3,
+    language: 'English',
+    rating: 'R'
+  },
+  {
+    id: 'sample-2',
+    title: 'The Godfather',
+    release_date: '1972-03-24',
+    duration: 175,
+    genre: 'crime',
+    director: 'Francis Ford Coppola',
+    synopsis: 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg',
+    imdb_rating: 9.2,
+    language: 'English, Italian, Latin',
+    rating: 'R'
+  },
+  {
+    id: 'sample-3',
+    title: 'Pulp Fiction',
+    release_date: '1994-10-14',
+    duration: 154,
+    genre: 'crime',
+    director: 'Quentin Tarantino',
+    synopsis: 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg',
+    imdb_rating: 8.9,
+    language: 'English, Spanish, French',
+    rating: 'R'
+  },
+  {
+    id: 'sample-4',
+    title: 'Inception',
+    release_date: '2010-07-16',
+    duration: 148,
+    genre: 'sci-fi',
+    director: 'Christopher Nolan',
+    synopsis: 'A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',
+    imdb_rating: 8.8,
+    language: 'English, Japanese, French',
+    rating: 'PG-13'
+  },
+  {
+    id: 'sample-5',
+    title: 'The Dark Knight',
+    release_date: '2008-07-18',
+    duration: 152,
+    genre: 'action',
+    director: 'Christopher Nolan',
+    synopsis: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg',
+    imdb_rating: 9.0,
+    language: 'English, Mandarin',
+    rating: 'PG-13'
+  },
+  {
+    id: 'sample-6',
+    title: 'Parasite',
+    release_date: '2019-11-08',
+    duration: 132,
+    genre: 'thriller',
+    director: 'Bong Joon Ho',
+    synopsis: 'Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_.jpg',
+    imdb_rating: 8.5,
+    language: 'Korean, English',
+    rating: 'R'
+  }
+];
+
 const Movies = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [usesSampleData, setUsesSampleData] = useState(false);
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   
   useEffect(() => {
@@ -51,12 +135,28 @@ const Movies = () => {
           throw error;
         }
         
-        setMovies(data || []);
-        setFilteredMovies(data || []);
-        console.log('Movies loaded from Supabase:', data);
+        // Check if we got any data from Supabase
+        if (data && data.length > 0) {
+          setMovies(data);
+          setFilteredMovies(data);
+          setUsesSampleData(false);
+          console.log('Movies loaded from Supabase:', data);
+        } else {
+          // If no movies are in the database, use sample movies
+          console.log('No movies in database, using sample data');
+          setMovies(sampleMovies);
+          setFilteredMovies(sampleMovies);
+          setUsesSampleData(true);
+          toast.info('Showing sample movie data for demonstration purposes');
+        }
       } catch (error) {
         console.error('Error fetching movies:', error);
-        toast.error('Failed to load movies. Please try again later.');
+        
+        // Fallback to sample data if there's an error
+        setMovies(sampleMovies);
+        setFilteredMovies(sampleMovies);
+        setUsesSampleData(true);
+        toast.error('Failed to load movies from database. Showing sample data instead.');
       } finally {
         setIsLoading(false);
       }
@@ -108,7 +208,7 @@ const Movies = () => {
               
               <AppHeader 
                 title="Movie Collection" 
-                subtitle="Browse our movie database"
+                subtitle={usesSampleData ? "Browsing sample movie data" : "Browse our movie database"}
                 className="mb-0"
               />
             </div>
