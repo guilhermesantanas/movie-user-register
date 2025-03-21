@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -38,6 +37,11 @@ const Movies = () => {
     const fetchMovies = async () => {
       setIsLoading(true);
       try {
+        const { data: authData } = await supabase.auth.getSession();
+        if (!authData.session) {
+          await supabase.auth.signInAnonymously();
+        }
+        
         const { data, error } = await supabase
           .from('movies')
           .select('*')

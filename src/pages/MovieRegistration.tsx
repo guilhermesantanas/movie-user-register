@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -24,6 +23,23 @@ const MovieRegistration = () => {
     if (username) {
       setRegisteredBy(username);
     }
+    
+    // Check if user is authenticated with Supabase
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        // If not authenticated, sign in anonymously to get a session
+        try {
+          const { error } = await supabase.auth.signInAnonymously();
+          if (error) throw error;
+          console.log('Signed in anonymously for movie registration');
+        } catch (error) {
+          console.error('Error signing in anonymously:', error);
+        }
+      }
+    };
+    
+    checkAuth();
   }, []);
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,6 +64,12 @@ const MovieRegistration = () => {
     };
     
     try {
+      // First ensure we're authenticated
+      const { data: authData } = await supabase.auth.getSession();
+      if (!authData.session) {
+        throw new Error('You must be authenticated to register a movie');
+      }
+      
       const { error } = await supabase
         .from('movies')
         .insert([movieData]);
