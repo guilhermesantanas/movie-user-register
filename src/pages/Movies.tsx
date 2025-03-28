@@ -10,7 +10,7 @@ import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
 import InputField from '@/components/InputField';
-import MovieCard from '@/components/MovieCard'; // Add this import
+import MovieCard from '@/components/MovieCard';
 import { 
   HoverCard,
   HoverCardContent,
@@ -144,28 +144,44 @@ const Movies = () => {
           throw error;
         }
         
+        // Get the array of deleted sample movie IDs from localStorage
+        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
+        
+        // Filter out any sample movies that were previously deleted
+        const filteredSampleMovies = sampleMovies.filter(movie => 
+          !deletedSampleMovieIds.includes(movie.id)
+        );
+        
         // Check if we got any data from Supabase
         if (data && data.length > 0) {
-          // Combine sample movies with database movies
-          const combinedMovies = [...data, ...sampleMovies];
+          // Combine database movies with filtered sample movies
+          const combinedMovies = [...data, ...filteredSampleMovies];
           setMovies(combinedMovies);
           setFilteredMovies(combinedMovies);
           setUsesSampleData(true);
           console.log('Movies loaded from database and sample data combined:', combinedMovies);
         } else {
-          // If no movies are in the database, use sample movies
+          // If no movies are in the database, use filtered sample movies
           console.log('No movies in database, using sample data');
-          setMovies(sampleMovies);
-          setFilteredMovies(sampleMovies);
+          setMovies(filteredSampleMovies);
+          setFilteredMovies(filteredSampleMovies);
           setUsesSampleData(true);
           toast.info('Showing sample movie data for demonstration purposes');
         }
       } catch (error) {
         console.error('Error fetching movies:', error);
         
-        // Fallback to sample data if there's an error
-        setMovies(sampleMovies);
-        setFilteredMovies(sampleMovies);
+        // Get the array of deleted sample movie IDs from localStorage
+        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
+        
+        // Filter out any sample movies that were previously deleted
+        const filteredSampleMovies = sampleMovies.filter(movie => 
+          !deletedSampleMovieIds.includes(movie.id)
+        );
+        
+        // Fallback to filtered sample data if there's an error
+        setMovies(filteredSampleMovies);
+        setFilteredMovies(filteredSampleMovies);
         setUsesSampleData(true);
         toast.error('Failed to load movies from database. Showing sample data instead.');
       } finally {
@@ -197,11 +213,19 @@ const Movies = () => {
     try {
       // Check if it's a sample movie (starts with 'sample-')
       if (movieId.startsWith('sample-')) {
-        // For sample movies, just remove from the UI
+        // For sample movies, remove from the UI and add to the deleted list in localStorage
         const updatedMovies = movies.filter(movie => movie.id !== movieId);
         setMovies(updatedMovies);
         setFilteredMovies(updatedMovies);
-        toast.success('Sample movie removed from view');
+        
+        // Add to deleted sample movie IDs in localStorage
+        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
+        if (!deletedSampleMovieIds.includes(movieId)) {
+          deletedSampleMovieIds.push(movieId);
+          localStorage.setItem('deletedSampleMovieIds', JSON.stringify(deletedSampleMovieIds));
+        }
+        
+        toast.success('Sample movie removed');
         return;
       }
       
