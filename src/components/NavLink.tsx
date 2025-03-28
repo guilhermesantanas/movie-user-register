@@ -19,8 +19,8 @@ const NavLink = ({ to, children, className, icon }: NavLinkProps) => {
         whileTap={{ scale: 0.98 }}
         className={cn(
           "flex items-center gap-2 p-3 rounded-xl transition-colors",
-          "bg-white/80 hover:bg-white backdrop-blur-md border border-gray-100",
-          "shadow-sm hover:shadow",
+          "bg-secondary/90 hover:bg-secondary/70 backdrop-blur-md border border-border",
+          "text-secondary-foreground shadow-sm hover:shadow",
           className
         )}
       >

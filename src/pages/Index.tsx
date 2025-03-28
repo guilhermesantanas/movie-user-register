@@ -33,7 +33,7 @@ const Index = () => {
             <NavLink 
               to="/login" 
               icon={<LogIn size={18} />}
-              className="hover:border-blue-100"
+              className="hover:border-primary/30"
             >
               Login
             </NavLink>
@@ -41,7 +41,7 @@ const Index = () => {
             <NavLink 
               to="/register-user" 
               icon={<UserPlus size={18} />}
-              className="hover:border-blue-100"
+              className="hover:border-primary/30"
             >
               Register New User
             </NavLink>
