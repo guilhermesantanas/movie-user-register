@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -122,9 +121,6 @@ const Movies = () => {
       setIsLoading(true);
       try {
         const { data: authData } = await supabase.auth.getSession();
-        if (!authData.session) {
-          await supabase.auth.signInAnonymously();
-        }
         
         const { data, error } = await supabase
           .from('movies')
@@ -137,10 +133,12 @@ const Movies = () => {
         
         // Check if we got any data from Supabase
         if (data && data.length > 0) {
-          setMovies(data);
-          setFilteredMovies(data);
-          setUsesSampleData(false);
-          console.log('Movies loaded from Supabase:', data);
+          // Combine sample movies with database movies
+          const combinedMovies = [...data, ...sampleMovies];
+          setMovies(combinedMovies);
+          setFilteredMovies(combinedMovies);
+          setUsesSampleData(true);
+          console.log('Movies loaded from database and sample data combined:', combinedMovies);
         } else {
           // If no movies are in the database, use sample movies
           console.log('No movies in database, using sample data');
