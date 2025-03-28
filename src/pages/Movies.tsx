@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Film, Plus, Search } from 'lucide-react';
+import { ArrowLeft, Film, Plus, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,17 @@ import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
 import InputField from '@/components/InputField';
+import { 
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface Movie {
   id: string;
@@ -180,6 +191,40 @@ const Movies = () => {
     setSearchTerm(e.target.value);
   };
   
+  const handleDeleteMovie = async (movieId: string) => {
+    try {
+      // Check if it's a sample movie (starts with 'sample-')
+      if (movieId.startsWith('sample-')) {
+        // For sample movies, just remove from the UI
+        const updatedMovies = movies.filter(movie => movie.id !== movieId);
+        setMovies(updatedMovies);
+        setFilteredMovies(updatedMovies);
+        toast.success('Sample movie removed from view');
+        return;
+      }
+      
+      // For real database movies, delete from Supabase
+      const { error } = await supabase
+        .from('movies')
+        .delete()
+        .eq('id', movieId);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Update UI after successful deletion
+      const updatedMovies = movies.filter(movie => movie.id !== movieId);
+      setMovies(updatedMovies);
+      setFilteredMovies(updatedMovies);
+      
+      toast.success('Movie deleted successfully');
+    } catch (error) {
+      console.error('Error deleting movie:', error);
+      toast.error('Failed to delete movie. Please try again.');
+    }
+  };
+  
   const handleAddMovie = () => {
     if (isLoggedIn) {
       navigate('/register-movie');
@@ -278,60 +323,17 @@ const Movies = () => {
               animate="show"
             >
               {filteredMovies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+                <MovieCard 
+                  key={movie.id} 
+                  movie={movie} 
+                  onDelete={handleDeleteMovie}
+                />
               ))}
             </motion.div>
           )}
         </div>
       </div>
     </PageTransition>
-  );
-};
-
-const MovieCard = ({ movie }: { movie: Movie }) => {
-  return (
-    <motion.div 
-      className="card overflow-hidden"
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-      }}
-    >
-      <div className="aspect-[2/3] bg-muted relative overflow-hidden">
-        {movie.poster_url ? (
-          <img 
-            src={movie.poster_url} 
-            alt={movie.title} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-            <Film size={48} className="text-gray-600" />
-          </div>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="font-bold text-lg mb-1">{movie.title}</h3>
-        <div className="flex items-center text-sm text-muted-foreground mb-2">
-          <span>{movie.release_date?.split('-')[0]}</span>
-          <span className="mx-2">•</span>
-          <span>{movie.duration} min</span>
-          <span className="mx-2">•</span>
-          <span>{movie.genre}</span>
-        </div>
-        <p className="text-sm text-muted-foreground mb-2">
-          Director: {movie.director}
-        </p>
-        <p className="text-sm line-clamp-3">
-          {movie.synopsis}
-        </p>
-        {movie.registered_by && (
-          <p className="text-xs text-muted-foreground mt-3">
-            Added by: {movie.registered_by}
-          </p>
-        )}
-      </div>
-    </motion.div>
   );
 };
 
