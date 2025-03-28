@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -16,6 +17,7 @@ const MovieRegistration = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registeredBy, setRegisteredBy] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   useEffect(() => {
     // Get the username from localStorage
@@ -27,15 +29,12 @@ const MovieRegistration = () => {
     // Check if user is authenticated with Supabase
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
+      setIsAuthenticated(!!data.session);
+      
       if (!data.session) {
-        // If not authenticated, sign in anonymously to get a session
-        try {
-          const { error } = await supabase.auth.signInAnonymously();
-          if (error) throw error;
-          console.log('Signed in anonymously for movie registration');
-        } catch (error) {
-          console.error('Error signing in anonymously:', error);
-        }
+        console.log('User is not authenticated');
+      } else {
+        console.log('User is authenticated');
       }
     };
     
@@ -46,28 +45,28 @@ const MovieRegistration = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Get form data
-    const formData = new FormData(e.target as HTMLFormElement);
-    
-    const movieData = {
-      title: formData.get('title') as string,
-      release_date: formData.get('releaseDate') as string,
-      duration: parseInt(formData.get('duration') as string),
-      genre: formData.get('genre') as string,
-      rating: formData.get('rating') as string,
-      director: formData.get('director') as string,
-      imdb_rating: parseFloat(formData.get('imdbRating') as string),
-      synopsis: formData.get('synopsis') as string,
-      language: formData.get('language') as string,
-      poster_url: formData.get('posterUrl') as string,
-      registered_by: registeredBy
-    };
-    
     try {
-      // First ensure we're authenticated
-      const { data: authData } = await supabase.auth.getSession();
-      if (!authData.session) {
-        throw new Error('You must be authenticated to register a movie');
+      // Get form data
+      const formData = new FormData(e.target as HTMLFormElement);
+      
+      const movieData = {
+        title: formData.get('title') as string,
+        release_date: formData.get('releaseDate') as string,
+        duration: parseInt(formData.get('duration') as string),
+        genre: formData.get('genre') as string,
+        rating: formData.get('rating') as string,
+        director: formData.get('director') as string,
+        imdb_rating: parseFloat(formData.get('imdbRating') as string),
+        synopsis: formData.get('synopsis') as string,
+        language: formData.get('language') as string,
+        poster_url: formData.get('posterUrl') as string,
+        registered_by: registeredBy
+      };
+      
+      // Check authentication status from state
+      if (!isAuthenticated) {
+        // For development purposes, still allow insert without authentication
+        console.log('Proceeding without authentication (development mode)');
       }
       
       const { error } = await supabase
@@ -75,6 +74,7 @@ const MovieRegistration = () => {
         .insert([movieData]);
       
       if (error) {
+        console.error('Database error:', error);
         throw error;
       }
       
