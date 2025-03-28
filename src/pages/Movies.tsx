@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,6 +10,7 @@ import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
 import InputField from '@/components/InputField';
+import MovieCard from '@/components/MovieCard'; // Add this import
 import { 
   HoverCard,
   HoverCardContent,
