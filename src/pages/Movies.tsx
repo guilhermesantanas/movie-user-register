@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Film, Plus, Search, X } from 'lucide-react';
+import { ArrowLeft, Film, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -11,17 +10,6 @@ import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
 import InputField from '@/components/InputField';
 import MovieCard from '@/components/MovieCard';
-import { 
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 
 interface Movie {
   id: string;
@@ -133,8 +121,16 @@ const Movies = () => {
     const fetchMovies = async () => {
       setIsLoading(true);
       try {
-        const { data: authData } = await supabase.auth.getSession();
+        // Get the array of deleted sample movie IDs from localStorage
+        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
         
+        // Filter out any sample movies that were previously deleted
+        const filteredSampleMovies = sampleMovies.filter(movie => 
+          !deletedSampleMovieIds.includes(movie.id)
+        );
+        
+        // Fetch movies from Supabase
+        const { data: authData } = await supabase.auth.getSession();
         const { data, error } = await supabase
           .from('movies')
           .select('*')
@@ -144,22 +140,13 @@ const Movies = () => {
           throw error;
         }
         
-        // Get the array of deleted sample movie IDs from localStorage
-        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
-        
-        // Filter out any sample movies that were previously deleted
-        const filteredSampleMovies = sampleMovies.filter(movie => 
-          !deletedSampleMovieIds.includes(movie.id)
-        );
-        
         // Check if we got any data from Supabase
         if (data && data.length > 0) {
-          // Combine database movies with filtered sample movies
-          const combinedMovies = [...data, ...filteredSampleMovies];
-          setMovies(combinedMovies);
-          setFilteredMovies(combinedMovies);
-          setUsesSampleData(true);
-          console.log('Movies loaded from database and sample data combined:', combinedMovies);
+          // Only use database movies, no sample movies
+          setMovies(data);
+          setFilteredMovies(data);
+          setUsesSampleData(false);
+          console.log('Movies loaded from database:', data);
         } else {
           // If no movies are in the database, use filtered sample movies
           console.log('No movies in database, using sample data');
@@ -213,7 +200,7 @@ const Movies = () => {
     try {
       // Check if it's a sample movie (starts with 'sample-')
       if (movieId.startsWith('sample-')) {
-        // For sample movies, remove from the UI and add to the deleted list in localStorage
+        // For sample movies, remove from local UI state
         const updatedMovies = movies.filter(movie => movie.id !== movieId);
         setMovies(updatedMovies);
         setFilteredMovies(updatedMovies);
@@ -224,6 +211,11 @@ const Movies = () => {
           deletedSampleMovieIds.push(movieId);
           localStorage.setItem('deletedSampleMovieIds', JSON.stringify(deletedSampleMovieIds));
         }
+        
+        // Also check if this movie is in localStorage as a viewed movie
+        const recentlyViewedMovies = JSON.parse(localStorage.getItem('recentlyViewedMovies') || '[]');
+        const updatedRecentlyViewed = recentlyViewedMovies.filter((movie: any) => movie.id !== movieId);
+        localStorage.setItem('recentlyViewedMovies', JSON.stringify(updatedRecentlyViewed));
         
         toast.success('Sample movie removed');
         return;
@@ -243,6 +235,11 @@ const Movies = () => {
       const updatedMovies = movies.filter(movie => movie.id !== movieId);
       setMovies(updatedMovies);
       setFilteredMovies(updatedMovies);
+      
+      // Also clean up any local storage references
+      const recentlyViewedMovies = JSON.parse(localStorage.getItem('recentlyViewedMovies') || '[]');
+      const updatedRecentlyViewed = recentlyViewedMovies.filter((movie: any) => movie.id !== movieId);
+      localStorage.setItem('recentlyViewedMovies', JSON.stringify(updatedRecentlyViewed));
       
       toast.success('Movie deleted successfully');
     } catch (error) {

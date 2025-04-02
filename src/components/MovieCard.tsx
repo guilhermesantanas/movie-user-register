@@ -37,12 +37,23 @@ interface MovieCardProps {
 
 const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    await onDelete(movie.id);
+    
+    if (isDeleting) return;
+    
+    setIsDeleting(true);
+    try {
+      await onDelete(movie.id);
+    } catch (error) {
+      console.error('Error deleting movie:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
   
   const handleCardClick = () => {
@@ -66,14 +77,19 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <button 
-                className="absolute top-2 right-2 z-10 p-1 bg-destructive rounded-full hover:bg-destructive/80 transition-colors"
+                className={`absolute top-2 right-2 z-10 p-1 ${isDeleting ? 'bg-gray-400' : 'bg-destructive'} rounded-full hover:bg-destructive/80 transition-colors`}
                 onClick={handleDelete}
+                disabled={isDeleting}
               >
-                <X size={18} className="text-white" />
+                {isDeleting ? (
+                  <div className="h-[18px] w-[18px] animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <X size={18} className="text-white" />
+                )}
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Delete movie</p>
+              <p>{isDeleting ? 'Deleting...' : 'Delete movie'}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
