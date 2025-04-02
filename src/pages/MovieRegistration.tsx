@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Film, Calendar, Clock, Tag, Users, ArrowLeft, Info, Star, Globe, User } from 'lucide-react';
+import { Film, Calendar, Clock, Tag, Users, ArrowLeft, Info, Star, Globe, User, Video } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -60,6 +60,7 @@ const MovieRegistration = () => {
         synopsis: formData.get('synopsis') as string,
         language: formData.get('language') as string,
         poster_url: formData.get('posterUrl') as string,
+        trailer_url: formData.get('trailerUrl') as string,
         registered_by: registeredBy
       };
       
@@ -229,6 +230,16 @@ const MovieRegistration = () => {
                   icon={<Info size={18} />}
                 />
               </div>
+              
+              <InputField
+                label="Trailer URL (YouTube Embed)"
+                id="trailerUrl"
+                name="trailerUrl"
+                type="url"
+                placeholder="https://www.youtube.com/embed/..."
+                icon={<Video size={18} />}
+                helperText="Use YouTube embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)"
+              />
               
               <InputField
                 label="Registered By"

@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import UserRegistration from "./pages/UserRegistration";
 import MovieRegistration from "./pages/MovieRegistration";
 import Movies from "./pages/Movies";
+import MovieDetails from "./pages/MovieDetails";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -37,6 +38,7 @@ const App = () => (
                 } 
               />
               <Route path="/movies" element={<Movies />} />
+              <Route path="/movie/:id" element={<MovieDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

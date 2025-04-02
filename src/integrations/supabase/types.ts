@@ -84,6 +84,38 @@ export type Database = {
           },
         ]
       }
+      movie_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          movie_id: string
+          rating: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          movie_id: string
+          rating: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movie_id?: string
+          rating?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movie_ratings_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       movies: {
         Row: {
           created_at: string
@@ -99,6 +131,7 @@ export type Database = {
           release_date: string | null
           synopsis: string | null
           title: string
+          trailer_url: string | null
         }
         Insert: {
           created_at?: string
@@ -114,6 +147,7 @@ export type Database = {
           release_date?: string | null
           synopsis?: string | null
           title: string
+          trailer_url?: string | null
         }
         Update: {
           created_at?: string
@@ -129,6 +163,7 @@ export type Database = {
           release_date?: string | null
           synopsis?: string | null
           title?: string
+          trailer_url?: string | null
         }
         Relationships: []
       }

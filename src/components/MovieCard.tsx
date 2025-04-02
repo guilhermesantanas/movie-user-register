@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Film, X } from 'lucide-react';
 import { 
@@ -36,6 +37,7 @@ interface MovieCardProps {
 
 const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
   
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -43,15 +45,21 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
     await onDelete(movie.id);
   };
   
+  const handleCardClick = () => {
+    navigate(`/movie/${movie.id}`);
+  };
+  
   return (
     <motion.div 
-      className="card overflow-hidden relative"
+      className="card overflow-hidden relative cursor-pointer"
       variants={{
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0 }
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleCardClick}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
       {isHovered && (
         <TooltipProvider>
