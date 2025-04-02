@@ -46,8 +46,8 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
     
     if (isDeleting) return;
     
-    setIsDeleting(true);
     try {
+      setIsDeleting(true);
       await onDelete(movie.id);
     } catch (error) {
       console.error('Error deleting movie:', error);
