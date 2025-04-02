@@ -1,0 +1,294 @@
+
+import React, { useState, useEffect } from 'react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Trash2, MessageSquare } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { formatDistanceToNow } from "date-fns";
+
+interface Comment {
+  id: string;
+  movie_id: string;
+  user_id: string | null;
+  user_name: string;
+  content: string;
+  created_at: string;
+}
+
+interface MovieCommentsProps {
+  movieId: string;
+}
+
+const MovieComments = ({ movieId }: MovieCommentsProps) => {
+  const { toast } = useToast();
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  // Fetch current user and admin status
+  useEffect(() => {
+    const fetchUserAndCheckAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        
+        // Get user's email from auth
+        const email = session.user.email;
+        if (email) {
+          // Use the part before @ as the username
+          setUserName(email.split('@')[0]);
+        }
+        
+        // Check if user is admin
+        const { data } = await supabase
+          .rpc('is_admin', { user_id: session.user.id });
+        
+        setIsAdmin(!!data);
+      }
+      setLoading(false);
+    };
+
+    fetchUserAndCheckAdmin();
+  }, []);
+
+  // Fetch comments
+  useEffect(() => {
+    const fetchComments = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('movie_comments')
+        .select('*')
+        .eq('movie_id', movieId)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching comments:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load comments",
+          variant: "destructive",
+        });
+      } else {
+        setComments(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchComments();
+    
+    // Set up realtime subscription for comments
+    const commentsSubscription = supabase
+      .channel('movie_comments_changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'movie_comments',
+          filter: `movie_id=eq.${movieId}`
+        }, 
+        () => {
+          fetchComments();
+        }
+      )
+      .subscribe();
+      
+    return () => {
+      commentsSubscription.unsubscribe();
+    };
+  }, [movieId, toast]);
+
+  const handleAddComment = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to add a comment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!newComment.trim()) {
+      toast({
+        title: "Empty Comment",
+        description: "Please enter some text for your comment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('movie_comments')
+        .insert([{
+          movie_id: movieId,
+          user_id: user.id,
+          user_name: userName,
+          content: newComment.trim()
+        }]);
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Comment Added",
+        description: "Your comment has been posted",
+      });
+      
+      setNewComment('');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to post comment",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string, commentUserId: string | null) => {
+    if (!user) return;
+    
+    // Check if user is the comment author or an admin
+    const canDelete = isAdmin || user.id === commentUserId;
+    
+    if (!canDelete) {
+      toast({
+        title: "Permission Denied",
+        description: "You can only delete your own comments",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('movie_comments')
+        .delete()
+        .eq('id', commentId);
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Comment Deleted",
+        description: "The comment has been removed",
+      });
+      
+      // Update the local state
+      setComments(comments.filter(comment => comment.id !== commentId));
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete comment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name.substring(0, 2).toUpperCase();
+  };
+  
+  // Get a consistent color based on the username
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      'bg-red-500', 'bg-blue-500', 'bg-green-500', 
+      'bg-yellow-500', 'bg-purple-500', 'bg-indigo-500',
+      'bg-pink-500', 'bg-teal-500'
+    ];
+    
+    // Simple hash function to determine color
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  return (
+    <div className="mt-8">
+      <h3 className="text-xl font-semibold mb-4 flex items-center">
+        <MessageSquare className="mr-2 h-5 w-5" />
+        Comments ({comments.length})
+      </h3>
+      
+      {user && (
+        <div className="mb-6">
+          <Textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Share your thoughts about this movie..."
+            className="mb-2 resize-none"
+            rows={3}
+          />
+          <Button 
+            onClick={handleAddComment}
+            disabled={submitting || !newComment.trim()}
+          >
+            Post Comment
+          </Button>
+        </div>
+      )}
+      
+      {!user && (
+        <div className="mb-6 p-4 border rounded-md bg-muted">
+          <p className="text-center">Please log in to add comments</p>
+        </div>
+      )}
+      
+      {loading ? (
+        <div className="text-center p-4">Loading comments...</div>
+      ) : comments.length === 0 ? (
+        <div className="text-center p-4 text-muted-foreground">
+          No comments yet. Be the first to share your thoughts!
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <div 
+              key={comment.id} 
+              className="p-4 border rounded-md bg-card"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <Avatar className={getAvatarColor(comment.user_name)}>
+                    <AvatarFallback>{getInitials(comment.user_name)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{comment.user_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+                
+                {user && (isAdmin || user.id === comment.user_id) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteComment(comment.id, comment.user_id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                )}
+              </div>
+              
+              <p className="mt-3 text-sm whitespace-pre-line">{comment.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MovieComments;

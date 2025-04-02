@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import RatingStars from '@/components/RatingStars';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import MovieComments from '@/components/MovieComments';
 
 interface MovieRating {
   id: string;
@@ -345,6 +346,9 @@ const MovieDetails = () => {
                 {movie.synopsis || 'No synopsis available.'}
               </p>
             </div>
+
+            {/* Comments Section */}
+            {id && <MovieComments movieId={id} />}
           </div>
         </div>
       </div>
