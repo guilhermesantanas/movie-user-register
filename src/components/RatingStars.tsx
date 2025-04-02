@@ -4,7 +4,7 @@ import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RatingStarsProps {
-  maxRating: number;
+  maxRating?: number;
   currentRating: number;
   onRatingChange?: (rating: number) => void;
   interactive?: boolean;
@@ -12,7 +12,7 @@ interface RatingStarsProps {
 }
 
 const RatingStars: React.FC<RatingStarsProps> = ({
-  maxRating = 5,
+  maxRating = 10,
   currentRating = 0,
   onRatingChange,
   interactive = true,
@@ -56,6 +56,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({
       {[...Array(maxRating)].map((_, index) => {
         const rating = index + 1;
         const filled = hoverRating ? rating <= hoverRating : rating <= currentRating;
+        const halfFilled = !filled && (rating - 0.5 <= currentRating);
         
         return (
           <span
@@ -71,7 +72,8 @@ const RatingStars: React.FC<RatingStarsProps> = ({
             <Star
               size={starSize}
               className={cn(
-                filled ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground",
+                filled ? "text-yellow-400 fill-yellow-400" : 
+                halfFilled ? "text-yellow-400 fill-yellow-400/50" : "text-muted-foreground",
                 interactive && !filled && "hover:text-yellow-200",
                 "transition-colors"
               )}

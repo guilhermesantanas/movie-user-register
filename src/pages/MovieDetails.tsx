@@ -1,524 +1,354 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, Clock, Star, User, Video, Tag, Globe, FileText } from 'lucide-react';
-import { toast } from 'sonner';
-
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 import PageTransition from '@/components/PageTransition';
-import AppHeader from '@/components/AppHeader';
-import Button from '@/components/Button';
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Play } from "lucide-react";
 import RatingStars from '@/components/RatingStars';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+
+interface MovieRating {
+  id: string;
+  movie_id: string;
+  user_id: string;
+  rating: number;
+  created_at: string;
+}
 
 interface Movie {
   id: string;
   title: string;
+  director: string;
+  genre: string;
   release_date: string;
   duration: number;
-  genre: string;
-  director: string;
+  imdb_rating: number;
+  language: string;
+  rating: string;
   synopsis: string;
-  poster_url?: string;
-  trailer_url?: string;
-  registered_by?: string;
-  imdb_rating?: number;
-  language?: string;
-  rating?: string;
+  poster_url: string;
+  trailer_url: string;
 }
 
-interface MovieRating {
-  movie_id: string;
-  rating: number;
-  user_id?: string;
-  created_at: string;
+interface UserRating {
+  userRating: number | null;
+  userRatingId: string | null;
 }
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [movie, setMovie] = useState<Movie | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userRating, setUserRating] = useState<number | null>(null);
-  const [averageRating, setAverageRating] = useState<number | null>(null);
-  const [ratingCount, setRatingCount] = useState(0);
-  const [isSampleMovie, setIsSampleMovie] = useState(false);
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  
-  const fetchMovie = async () => {
-    if (!id) return;
-    
-    setIsLoading(true);
-    
-    try {
-      // Check if it's a sample movie (id starting with 'sample-')
-      if (id.startsWith('sample-')) {
-        // Get sample movies from local storage (if available) or use the default array
-        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
-        
-        // Import the sample movies array from Movies.tsx
-        // For simplicity in this implementation, we'll hard-code the sample movies
-        const sampleMovies = [
-          {
-            id: 'sample-1',
-            title: 'The Shawshank Redemption',
-            release_date: '1994-09-23',
-            duration: 142,
-            genre: 'drama',
-            director: 'Frank Darabont',
-            synopsis: 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.',
-            poster_url: 'https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg',
-            imdb_rating: 9.3,
-            language: 'English',
-            rating: 'R',
-            trailer_url: 'https://www.youtube.com/embed/6hB3S9bIaco'
-          },
-          {
-            id: 'sample-2',
-            title: 'The Godfather',
-            release_date: '1972-03-24',
-            duration: 175,
-            genre: 'crime',
-            director: 'Francis Ford Coppola',
-            synopsis: 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
-            poster_url: 'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg',
-            imdb_rating: 9.2,
-            language: 'English, Italian, Latin',
-            rating: 'R',
-            trailer_url: 'https://www.youtube.com/embed/sY1S34973zA'
-          },
-          {
-            id: 'sample-3',
-            title: 'Pulp Fiction',
-            release_date: '1994-10-14',
-            duration: 154,
-            genre: 'crime',
-            director: 'Quentin Tarantino',
-            synopsis: 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.',
-            poster_url: 'https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg',
-            imdb_rating: 8.9,
-            language: 'English, Spanish, French',
-            rating: 'R',
-            trailer_url: 'https://www.youtube.com/embed/s7EdQ4FqbhY'
-          },
-          {
-            id: 'sample-4',
-            title: 'Inception',
-            release_date: '2010-07-16',
-            duration: 148,
-            genre: 'sci-fi',
-            director: 'Christopher Nolan',
-            synopsis: 'A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.',
-            poster_url: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',
-            imdb_rating: 8.8,
-            language: 'English, Japanese, French',
-            rating: 'PG-13',
-            trailer_url: 'https://www.youtube.com/embed/YoHD9XEInc0'
-          },
-          {
-            id: 'sample-5',
-            title: 'The Dark Knight',
-            release_date: '2008-07-18',
-            duration: 152,
-            genre: 'action',
-            director: 'Christopher Nolan',
-            synopsis: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.',
-            poster_url: 'https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg',
-            imdb_rating: 9.0,
-            language: 'English, Mandarin',
-            rating: 'PG-13',
-            trailer_url: 'https://www.youtube.com/embed/EXeTwQWrcwY'
-          },
-          {
-            id: 'sample-6',
-            title: 'Parasite',
-            release_date: '2019-11-08',
-            duration: 132,
-            genre: 'thriller',
-            director: 'Bong Joon Ho',
-            synopsis: 'Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.',
-            poster_url: 'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_.jpg',
-            imdb_rating: 8.5,
-            language: 'Korean, English',
-            rating: 'R',
-            trailer_url: 'https://www.youtube.com/embed/isOGD_7hNIY'
-          }
-        ];
-        
-        const foundMovie = sampleMovies.find(movie => movie.id === id);
-        
-        if (foundMovie && !deletedSampleMovieIds.includes(id)) {
-          setMovie(foundMovie);
-          setIsSampleMovie(true);
-          setAverageRating(foundMovie.imdb_rating || null);
-          setRatingCount(1); // Assume 1 rating for sample movies (IMDb)
-        } else {
-          toast.error('Movie not found');
-          navigate('/movies');
-        }
-      } else {
-        // Fetch from Supabase for real movies
-        const { data: movieData, error: movieError } = await supabase
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [ratingCount, setRatingCount] = useState<number>(0);
+  const [user, setUser] = useState<any>(null);
+  const [userRating, setUserRating] = useState<UserRating>({
+    userRating: null,
+    userRatingId: null
+  });
+  const [trailerOpen, setTrailerOpen] = useState(false);
+
+  // Fetch movie details
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
           .from('movies')
           .select('*')
           .eq('id', id)
           .single();
-        
-        if (movieError) {
-          throw movieError;
-        }
-        
-        if (!movieData) {
-          toast.error('Movie not found');
-          navigate('/movies');
-          return;
-        }
-        
-        setMovie(movieData);
-        
-        // Fetch all ratings for this movie
-        const { data: ratingsData, error: ratingsError } = await supabase
-          .from('movie_ratings')
-          .select('*')
-          .eq('movie_id', id);
-        
-        if (ratingsError) {
-          console.error('Error fetching ratings:', ratingsError);
-        } else if (ratingsData && ratingsData.length > 0) {
-          // Calculate average rating
-          const total = ratingsData.reduce((sum, rating) => sum + rating.rating, 0);
-          setAverageRating(parseFloat((total / ratingsData.length).toFixed(1)));
-          setRatingCount(ratingsData.length);
           
-          // Check if the current user has already rated this movie
-          if (isLoggedIn) {
-            const { data: userData } = await supabase.auth.getSession();
-            const userId = userData.session?.user.id;
+        if (error) throw error;
+        
+        if (data) {
+          setMovie(data as Movie);
+        } else {
+          setError('Movie not found');
+        }
+      } catch (error: any) {
+        setError(error.message);
+        toast({
+          title: "Error",
+          description: "Failed to load movie details",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovie();
+  }, [id, toast]);
+
+  // Fetch user session and ratings
+  useEffect(() => {
+    const fetchUserAndRatings = async () => {
+      try {
+        // Get current user
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser(session.user);
+          
+          // Fetch user's rating for this movie if they're logged in
+          const { data: userRatingData, error: userRatingError } = await supabase
+            .from('movie_ratings')
+            .select('*')
+            .eq('movie_id', id)
+            .eq('user_id', session.user.id)
+            .maybeSingle();
             
-            if (userId) {
-              const userRatingData = ratingsData.find(rating => rating.user_id === userId);
-              if (userRatingData) {
-                setUserRating(userRatingData.rating);
-              }
-            }
+          if (!userRatingError && userRatingData) {
+            setUserRating({
+              userRating: userRatingData.rating,
+              userRatingId: userRatingData.id
+            });
           }
         }
+        
+        // Fetch average rating and count
+        const { data: ratingsData, error: ratingsError } = await supabase
+          .from('movie_ratings')
+          .select('rating')
+          .eq('movie_id', id);
+          
+        if (!ratingsError && ratingsData && ratingsData.length > 0) {
+          const total = ratingsData.reduce((sum, item) => sum + item.rating, 0);
+          setAverageRating(total / ratingsData.length);
+          setRatingCount(ratingsData.length);
+        }
+      } catch (error) {
+        console.error('Error fetching user or ratings:', error);
       }
-    } catch (error) {
-      console.error('Error fetching movie details:', error);
-      toast.error('Failed to load movie details');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  useEffect(() => {
-    fetchMovie();
+    };
+
+    fetchUserAndRatings();
   }, [id]);
-  
-  const handleRatingChange = async (newRating: number) => {
-    if (!isLoggedIn) {
-      toast.error('You must be logged in to rate movies');
-      navigate('/login');
+
+  const handleRateMovie = async (rating: number) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to rate this movie",
+        variant: "destructive",
+      });
       return;
     }
-    
-    if (isSampleMovie) {
-      toast.error('Rating sample movies is not supported');
-      return;
-    }
-    
+
     try {
-      const { data: userData } = await supabase.auth.getSession();
-      const userId = userData.session?.user.id;
-      
-      if (!userId) {
-        toast.error('Authentication error. Please log in again');
-        navigate('/login');
-        return;
-      }
-      
-      if (userRating) {
+      if (userRating.userRatingId) {
         // Update existing rating
         const { error } = await supabase
           .from('movie_ratings')
-          .update({ rating: newRating })
-          .eq('movie_id', id)
-          .eq('user_id', userId);
-        
+          .update({ rating })
+          .eq('id', userRating.userRatingId);
+          
         if (error) throw error;
-        toast.success('Your rating has been updated');
+        
+        toast({
+          title: "Rating Updated",
+          description: "Your rating has been updated",
+        });
       } else {
         // Insert new rating
         const { error } = await supabase
           .from('movie_ratings')
-          .insert({
-            movie_id: id as string,
-            user_id: userId,
-            rating: newRating
-          });
-        
+          .insert([{ 
+            movie_id: id,
+            user_id: user.id,
+            rating 
+          }]);
+          
         if (error) throw error;
-        toast.success('Your rating has been submitted');
+        
+        toast({
+          title: "Rating Submitted",
+          description: "Thanks for rating this movie!",
+        });
       }
-      
-      // Update UI and refetch ratings
-      setUserRating(newRating);
-      fetchMovie();
-    } catch (error) {
-      console.error('Error submitting rating:', error);
-      toast.error('Failed to submit rating. Please try again');
+
+      // Refresh ratings
+      const { data: ratingsData, error: ratingsError } = await supabase
+        .from('movie_ratings')
+        .select('*')
+        .eq('movie_id', id);
+        
+      if (!ratingsError && ratingsData) {
+        const total = ratingsData.reduce((sum, item) => sum + item.rating, 0);
+        setAverageRating(ratingsData.length > 0 ? total / ratingsData.length : 0);
+        setRatingCount(ratingsData.length);
+        
+        // Update user rating in state
+        const userRatingData = ratingsData.find(item => item.user_id === user.id);
+        if (userRatingData) {
+          setUserRating({
+            userRating: userRatingData.rating,
+            userRatingId: userRatingData.id
+          });
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit rating",
+        variant: "destructive",
+      });
     }
   };
-  
-  if (isLoading) {
+
+  if (loading) {
     return (
       <PageTransition>
-        <div className="min-h-screen py-12 px-6">
-          <div className="w-full max-w-7xl mx-auto">
-            <div className="flex justify-center items-center py-24">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-            </div>
+        <div className="container max-w-6xl mx-auto py-10">
+          <div className="flex justify-center items-center h-[60vh]">
+            <p className="text-lg">Loading movie details...</p>
           </div>
         </div>
       </PageTransition>
     );
   }
-  
-  if (!movie) {
+
+  if (error || !movie) {
     return (
       <PageTransition>
-        <div className="min-h-screen py-12 px-6">
-          <div className="w-full max-w-7xl mx-auto">
-            <Button 
-              variant="outline" 
-              className="mb-6" 
-              onClick={() => navigate('/movies')}
-              icon={<ArrowLeft size={16} />}
-            >
-              Back to Movies
-            </Button>
-            
-            <div className="text-center p-12 border border-dashed rounded-lg">
-              <h3 className="text-xl font-medium mb-2">Movie not found</h3>
-              <p className="text-muted-foreground mb-4">
-                The movie you're looking for doesn't exist or has been removed.
-              </p>
-              <Button onClick={() => navigate('/movies')}>
-                Browse Movies
-              </Button>
-            </div>
+        <div className="container max-w-6xl mx-auto py-10">
+          <div className="flex flex-col justify-center items-center h-[60vh]">
+            <p className="text-lg text-red-500 mb-4">{error || "Movie not found"}</p>
+            <Button onClick={() => navigate('/movies')}>Back to Movies</Button>
           </div>
         </div>
       </PageTransition>
     );
   }
-  
+
   return (
     <PageTransition>
-      <div className="min-h-screen py-12 px-6">
-        <div className="w-full max-w-7xl mx-auto">
-          <Button 
-            variant="outline" 
-            className="mb-6" 
-            onClick={() => navigate('/movies')}
-            icon={<ArrowLeft size={16} />}
-          >
-            Back to Movies
-          </Button>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Movie Poster */}
-            <div className="lg:col-span-1">
-              <motion.div 
-                className="sticky top-6 aspect-[2/3] bg-muted rounded-xl overflow-hidden shadow-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {movie.poster_url ? (
-                  <img 
-                    src={movie.poster_url} 
-                    alt={movie.title} 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                    <Video size={64} className="text-gray-600" />
-                  </div>
-                )}
-              </motion.div>
+      <div className="container max-w-6xl mx-auto py-10 px-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/movies')} 
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Movies
+        </Button>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Movie Poster */}
+          <div className="md:col-span-1">
+            <div className="relative rounded-lg overflow-hidden shadow-lg">
+              <img 
+                src={movie.poster_url || '/placeholder.svg'} 
+                alt={movie.title} 
+                className="w-full h-auto object-cover"
+              />
             </div>
-            
-            {/* Movie Details */}
-            <div className="lg:col-span-2">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">{movie.title}</h1>
-                
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-4">
-                  {movie.release_date && (
-                    <div className="flex items-center gap-1">
-                      <Calendar size={16} />
-                      <span>{new Date(movie.release_date).getFullYear()}</span>
-                    </div>
-                  )}
-                  
-                  {movie.duration && (
-                    <div className="flex items-center gap-1">
-                      <Clock size={16} />
-                      <span>{movie.duration} min</span>
-                    </div>
-                  )}
-                  
-                  {movie.genre && (
-                    <div className="flex items-center gap-1">
-                      <Tag size={16} />
-                      <span className="capitalize">{movie.genre}</span>
-                    </div>
-                  )}
-                  
-                  {movie.rating && (
-                    <span className="px-2 py-0.5 bg-secondary text-secondary-foreground rounded-md text-xs">
-                      {movie.rating}
-                    </span>
-                  )}
-                  
-                  {movie.language && (
-                    <div className="flex items-center gap-1">
-                      <Globe size={16} />
-                      <span>{movie.language}</span>
-                    </div>
-                  )}
+
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Movie Rating</h3>
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <RatingStars 
+                    currentRating={averageRating} 
+                    interactive={false} 
+                    maxRating={10}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    ({averageRating.toFixed(1)}/10 from {ratingCount} {ratingCount === 1 ? 'user' : 'users'})
+                  </span>
                 </div>
                 
-                {/* Movie Trailer */}
-                {movie.trailer_url && (
-                  <div className="mb-6">
-                    <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                      <iframe 
-                        width="100%" 
-                        height="100%" 
-                        src={movie.trailer_url} 
-                        title={`${movie.title} trailer`}
-                        frameBorder="0"
+                {user && (
+                  <div className="mt-4">
+                    <p className="text-sm mb-1">Your Rating:</p>
+                    <RatingStars
+                      currentRating={userRating.userRating || 0}
+                      onRatingChange={handleRateMovie}
+                      maxRating={10}
+                    />
+                  </div>
+                )}
+                
+                {!user && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Log in to rate this movie
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Movie Information */}
+          <div className="md:col-span-2">
+            <h1 className="text-3xl font-bold mb-2">{movie.title}</h1>
+            
+            {movie.trailer_url && (
+              <div className="mb-6">
+                {trailerOpen ? (
+                  <div className="rounded-lg overflow-hidden">
+                    <AspectRatio ratio={16/9}>
+                      <iframe
+                        src={movie.trailer_url}
+                        title={`${movie.title} Trailer`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
                       ></iframe>
-                    </div>
+                    </AspectRatio>
                   </div>
+                ) : (
+                  <Button 
+                    onClick={() => setTrailerOpen(true)}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    <Play className="mr-2 h-4 w-4" /> Watch Trailer
+                  </Button>
                 )}
-                
-                {/* Ratings Section */}
-                <Card className="mb-6">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Ratings</CardTitle>
-                    {averageRating ? (
-                      <CardDescription>
-                        Average: <span className="font-medium">{averageRating}</span>/10 
-                        <span className="text-xs ml-1">({ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'})</span>
-                      </CardDescription>
-                    ) : (
-                      <CardDescription>No ratings yet</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">
-                        {userRating ? 'Your rating' : 'Rate this movie'}
-                      </h4>
-                      <RatingStars 
-                        maxRating={10}
-                        currentRating={userRating || 0}
-                        onRatingChange={handleRatingChange}
-                        interactive={isLoggedIn && !isSampleMovie}
-                      />
-                      
-                      {(!isLoggedIn && !isSampleMovie) && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          <a href="/login" className="text-primary hover:underline">Log in</a> to rate this movie
-                        </p>
-                      )}
-                      
-                      {isSampleMovie && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Rating not available for sample movies
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Synopsis */}
-                <Card className="mb-6">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText size={18} />
-                      Synopsis
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      {movie.synopsis || 'No synopsis available.'}
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                {/* Director */}
-                {movie.director && (
-                  <Card className="mb-6">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center gap-2">
-                        <User size={18} />
-                        Director
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{movie.director}</p>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {/* IMDb Rating */}
-                {movie.imdb_rating && (
-                  <Card className="mb-6">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center gap-2">
-                        <Star size={18} />
-                        IMDb Rating
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-lg">{movie.imdb_rating}</span>
-                        <span className="text-sm text-muted-foreground">/10</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {/* Added by */}
-                {movie.registered_by && (
-                  <div className="text-xs text-muted-foreground mt-8">
-                    Added by: {movie.registered_by}
-                  </div>
-                )}
-              </motion.div>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Director</h3>
+                <p>{movie.director || 'Not specified'}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Genre</h3>
+                <p>{movie.genre || 'Not specified'}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Release Date</h3>
+                <p>{movie.release_date ? new Date(movie.release_date).toLocaleDateString() : 'Not specified'}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Duration</h3>
+                <p>{movie.duration ? `${movie.duration} min` : 'Not specified'}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Language</h3>
+                <p>{movie.language || 'Not specified'}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">IMDb Rating</h3>
+                <p>{movie.imdb_rating || 'Not rated'}</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Synopsis</h3>
+              <p className="text-gray-700 dark:text-gray-300">
+                {movie.synopsis || 'No synopsis available.'}
+              </p>
             </div>
           </div>
         </div>
       </div>
+      <Toaster />
     </PageTransition>
   );
 };
