@@ -39,7 +39,7 @@ const MoviePoster = ({
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2">
             <RatingStars 
-              currentRating={averageRating} 
+              currentRating={displayRating} 
               interactive={false} 
               maxRating={5}
             />

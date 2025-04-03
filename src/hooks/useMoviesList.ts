@@ -97,6 +97,32 @@ const sampleMovies: Movie[] = [
     imdb_rating: 8.5,
     language: 'Korean, English',
     rating: 'R'
+  },
+  {
+    id: 'sample-7',
+    title: 'Everything Everywhere All at Once',
+    release_date: '2022-03-25',
+    duration: 139,
+    genre: 'action',
+    director: 'Daniel Kwan, Daniel Scheinert',
+    synopsis: 'An aging Chinese immigrant is swept up in an insane adventure, where she alone can save the world by exploring other universes connecting with the lives she could have led.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BYTdiOTIyZTQtNmQ1OS00NjZlLWIyMTgtYzk5Y2M3ZDVmMDk1XkEyXkFqcGdeQXVyMTAzMDg4NzU0._V1_.jpg',
+    imdb_rating: 7.9,
+    language: 'English, Mandarin, Cantonese',
+    rating: 'R'
+  },
+  {
+    id: 'sample-8',
+    title: 'The Matrix',
+    release_date: '1999-03-31',
+    duration: 136,
+    genre: 'sci-fi',
+    director: 'Lana Wachowski, Lilly Wachowski',
+    synopsis: 'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
+    poster_url: 'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',
+    imdb_rating: 8.7,
+    language: 'English',
+    rating: 'R'
   }
 ];
 
