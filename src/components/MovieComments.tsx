@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, MessageSquare } from "lucide-react";
+import { Trash2, MessageSquare, Shield } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 
@@ -229,12 +229,21 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
             className="mb-2 resize-none"
             rows={3}
           />
-          <Button 
-            onClick={handleAddComment}
-            disabled={submitting || !newComment.trim()}
-          >
-            Post Comment
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={handleAddComment}
+              disabled={submitting || !newComment.trim()}
+            >
+              Post Comment
+            </Button>
+            
+            {isAdmin && (
+              <div className="flex items-center text-[#FEF7CD] text-sm ml-2">
+                <Shield size={14} className="mr-1" />
+                <span>Admin</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
       
@@ -262,8 +271,16 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
                   <Avatar className={getAvatarColor(comment.user_name)}>
                     <AvatarFallback>{getInitials(comment.user_name)}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="font-medium">{comment.user_name}</p>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{comment.user_name}</p>
+                      {comment.user_id === user?.id && isAdmin && (
+                        <span className="text-[#FEF7CD] text-xs flex items-center">
+                          <Shield size={12} className="mr-1" />
+                          Admin
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                     </p>

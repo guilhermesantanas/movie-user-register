@@ -20,11 +20,11 @@ const MovieHeader = ({
   const navigate = useNavigate();
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 mb-6">
       <Button 
         variant="ghost" 
         onClick={() => navigate(backTo)} 
-        className="mb-6"
+        className="mb-4"
       >
         <ArrowLeft className="mr-2 h-4 w-4" /> {backButtonText}
       </Button>

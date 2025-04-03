@@ -12,7 +12,7 @@ interface RatingStarsProps {
 }
 
 const RatingStars: React.FC<RatingStarsProps> = ({
-  maxRating = 10,
+  maxRating = 5,
   currentRating = 0,
   onRatingChange,
   interactive = true,
@@ -55,8 +55,10 @@ const RatingStars: React.FC<RatingStarsProps> = ({
     >
       {[...Array(maxRating)].map((_, index) => {
         const rating = index + 1;
-        const filled = hoverRating ? rating <= hoverRating : rating <= currentRating;
-        const halfFilled = !filled && (rating - 0.5 <= currentRating);
+        // For 5-star rating when original is 10-star, we need to multiply currentRating by 0.5
+        const normalizedRating = maxRating === 5 && currentRating > 5 ? currentRating * 0.5 : currentRating;
+        const filled = hoverRating ? rating <= hoverRating : rating <= normalizedRating;
+        const halfFilled = !filled && (rating - 0.5 <= normalizedRating);
         
         return (
           <span

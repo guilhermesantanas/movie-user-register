@@ -21,6 +21,9 @@ const MoviePoster = ({
   userLoggedIn,
   onRateMovie 
 }: MoviePosterProps) => {
+  // Convert 10-scale rating to 5-scale for display
+  const displayRating = averageRating / 2;
+  
   return (
     <div className="md:col-span-1">
       <div className="relative rounded-lg overflow-hidden shadow-lg">
@@ -38,10 +41,10 @@ const MoviePoster = ({
             <RatingStars 
               currentRating={averageRating} 
               interactive={false} 
-              maxRating={10}
+              maxRating={5}
             />
             <span className="text-sm text-muted-foreground">
-              ({averageRating.toFixed(1)}/10 from {ratingCount} {ratingCount === 1 ? 'user' : 'users'})
+              ({displayRating.toFixed(1)}/5 from {ratingCount} {ratingCount === 1 ? 'user' : 'users'})
             </span>
           </div>
           
@@ -49,9 +52,9 @@ const MoviePoster = ({
             <div className="mt-4">
               <p className="text-sm mb-1">Your Rating:</p>
               <RatingStars
-                currentRating={userRating || 0}
-                onRatingChange={onRateMovie}
-                maxRating={10}
+                currentRating={userRating ? userRating / 2 : 0}
+                onRatingChange={(rating) => onRateMovie(rating * 2)} // Convert 5-scale back to 10-scale
+                maxRating={5}
               />
             </div>
           )}
