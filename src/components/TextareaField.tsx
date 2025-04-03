@@ -6,10 +6,11 @@ import { motion } from 'framer-motion';
 interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   error?: string;
+  icon?: React.ReactNode;
 }
 
 const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
-  ({ label, error, className, ...props }, ref) => {
+  ({ label, error, className, icon, ...props }, ref) => {
     return (
       <motion.div 
         className="mb-4"
@@ -20,15 +21,23 @@ const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
         <label className="block text-sm font-medium mb-1" htmlFor={props.id || props.name}>
           {label}
         </label>
-        <textarea
-          ref={ref}
-          className={cn(
-            "input-field min-h-[100px] resize-y",
-            error && "border-red-300 focus:border-red-400 focus:ring-red-200",
-            className
+        <div className="relative">
+          {icon && (
+            <div className="absolute left-3 top-5 text-gray-400">
+              {icon}
+            </div>
           )}
-          {...props}
-        />
+          <textarea
+            ref={ref}
+            className={cn(
+              "input-field min-h-[100px] resize-y",
+              icon && "pl-10",
+              error && "border-red-300 focus:border-red-400 focus:ring-red-200",
+              className
+            )}
+            {...props}
+          />
+        </div>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </motion.div>
     );

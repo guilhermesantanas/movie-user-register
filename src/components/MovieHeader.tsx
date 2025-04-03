@@ -6,22 +6,31 @@ import { Button } from "@/components/ui/button";
 
 interface MovieHeaderProps {
   title: string;
+  subtitle?: string;
+  backButtonText?: string;
+  backTo?: string;
 }
 
-const MovieHeader = ({ title }: MovieHeaderProps) => {
+const MovieHeader = ({ 
+  title, 
+  subtitle, 
+  backButtonText = "Back to Movies", 
+  backTo = '/movies' 
+}: MovieHeaderProps) => {
   const navigate = useNavigate();
   
   return (
-    <>
+    <div className="space-y-2">
       <Button 
         variant="ghost" 
-        onClick={() => navigate('/movies')} 
+        onClick={() => navigate(backTo)} 
         className="mb-6"
       >
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Movies
+        <ArrowLeft className="mr-2 h-4 w-4" /> {backButtonText}
       </Button>
       <h1 className="text-3xl font-bold mb-2">{title}</h1>
-    </>
+      {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
+    </div>
   );
 };
 

@@ -12,7 +12,7 @@ interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement>
 }
 
 const SelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
-  ({ label, options, error, className, icon, ...props }, ref) => {
+  ({ label, options, error, className, icon, placeholder = "Select an option", ...props }, ref) => {
     return (
       <motion.div 
         className="mb-4"
@@ -39,7 +39,7 @@ const SelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
             )}
             {...props}
           >
-            <option value="">Select an option</option>
+            <option value="">{placeholder}</option>
             {options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
