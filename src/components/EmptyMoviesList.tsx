@@ -22,11 +22,11 @@ const EmptyMoviesList = ({ isEmpty, isSearching, isLoggedIn, onAddMovie }: Empty
       animate={{ opacity: 1 }}
     >
       <Film size={48} className="mx-auto text-muted-foreground mb-4" />
-      <h3 className="text-lg font-medium mb-2">No movies found</h3>
+      <h3 className="text-lg font-medium mb-2">Nenhum filme encontrado</h3>
       <p className="text-muted-foreground">
         {!isSearching 
-          ? "There are no movies in the database yet." 
-          : "No movies match your search criteria."}
+          ? "Não há filmes no banco de dados ainda." 
+          : "Nenhum filme corresponde aos seus critérios de busca."}
       </p>
       
       {isLoggedIn && !isSearching && (
@@ -35,7 +35,7 @@ const EmptyMoviesList = ({ isEmpty, isSearching, isLoggedIn, onAddMovie }: Empty
           onClick={onAddMovie}
           icon={<Plus size={18} />}
         >
-          Add Your First Movie
+          Adicione Seu Primeiro Filme
         </Button>
       )}
     </motion.div>

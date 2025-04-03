@@ -35,7 +35,7 @@ const MoviePoster = ({
       </div>
 
       <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-2">Movie Rating</h3>
+        <h3 className="text-lg font-semibold mb-2">Avaliação do Filme</h3>
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2">
             <RatingStars 
@@ -44,13 +44,13 @@ const MoviePoster = ({
               maxRating={5}
             />
             <span className="text-sm text-muted-foreground">
-              ({displayRating.toFixed(1)}/5 from {ratingCount} {ratingCount === 1 ? 'user' : 'users'})
+              ({displayRating.toFixed(1)}/5 de {ratingCount} {ratingCount === 1 ? 'usuário' : 'usuários'})
             </span>
           </div>
           
           {userLoggedIn && (
             <div className="mt-4">
-              <p className="text-sm mb-1">Your Rating:</p>
+              <p className="text-sm mb-1">Sua Avaliação:</p>
               <RatingStars
                 currentRating={userRating ? userRating / 2 : 0}
                 onRatingChange={(rating) => onRateMovie(rating * 2)} // Convert 5-scale back to 10-scale
@@ -61,7 +61,7 @@ const MoviePoster = ({
           
           {!userLoggedIn && (
             <p className="text-sm text-muted-foreground mt-2">
-              Log in to rate this movie
+              Faça login para avaliar este filme
             </p>
           )}
         </div>

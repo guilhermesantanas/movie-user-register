@@ -68,10 +68,10 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         .order('created_at', { ascending: false });
         
       if (error) {
-        console.error('Error fetching comments:', error);
+        console.error('Erro ao buscar comentários:', error);
         toast({
-          title: "Error",
-          description: "Failed to load comments",
+          title: "Erro",
+          description: "Falha ao carregar comentários",
           variant: "destructive",
         });
       } else {
@@ -106,8 +106,8 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
   const handleAddComment = async () => {
     if (!user) {
       toast({
-        title: "Authentication Required",
-        description: "Please log in to add a comment",
+        title: "Autenticação Necessária",
+        description: "Por favor, faça login para adicionar um comentário",
         variant: "destructive",
       });
       return;
@@ -115,8 +115,8 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
 
     if (!newComment.trim()) {
       toast({
-        title: "Empty Comment",
-        description: "Please enter some text for your comment",
+        title: "Comentário Vazio",
+        description: "Por favor, digite algum texto para seu comentário",
         variant: "destructive",
       });
       return;
@@ -137,15 +137,15 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
       if (error) throw error;
       
       toast({
-        title: "Comment Added",
-        description: "Your comment has been posted",
+        title: "Comentário Adicionado",
+        description: "Seu comentário foi publicado",
       });
       
       setNewComment('');
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to post comment",
+        title: "Erro",
+        description: error.message || "Falha ao publicar comentário",
         variant: "destructive",
       });
     } finally {
@@ -161,8 +161,8 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     
     if (!canDelete) {
       toast({
-        title: "Permission Denied",
-        description: "You can only delete your own comments",
+        title: "Permissão Negada",
+        description: "Você só pode excluir seus próprios comentários",
         variant: "destructive",
       });
       return;
@@ -177,16 +177,16 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
       if (error) throw error;
       
       toast({
-        title: "Comment Deleted",
-        description: "The comment has been removed",
+        title: "Comentário Excluído",
+        description: "O comentário foi removido",
       });
       
       // Update the local state
       setComments(comments.filter(comment => comment.id !== commentId));
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete comment",
+        title: "Erro",
+        description: error.message || "Falha ao excluir comentário",
         variant: "destructive",
       });
     }
@@ -217,7 +217,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     <div className="mt-8">
       <h3 className="text-xl font-semibold mb-4 flex items-center">
         <MessageSquare className="mr-2 h-5 w-5" />
-        Comments ({comments.length})
+        Comentários ({comments.length})
       </h3>
       
       {user && (
@@ -225,7 +225,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
           <Textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share your thoughts about this movie..."
+            placeholder="Compartilhe seus pensamentos sobre este filme..."
             className="mb-2 resize-none"
             rows={3}
           />
@@ -234,7 +234,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
               onClick={handleAddComment}
               disabled={submitting || !newComment.trim()}
             >
-              Post Comment
+              Publicar Comentário
             </Button>
             
             {isAdmin && (
@@ -249,15 +249,15 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
       
       {!user && (
         <div className="mb-6 p-4 border rounded-md bg-muted">
-          <p className="text-center">Please log in to add comments</p>
+          <p className="text-center">Por favor, faça login para adicionar comentários</p>
         </div>
       )}
       
       {loading ? (
-        <div className="text-center p-4">Loading comments...</div>
+        <div className="text-center p-4">Carregando comentários...</div>
       ) : comments.length === 0 ? (
         <div className="text-center p-4 text-muted-foreground">
-          No comments yet. Be the first to share your thoughts!
+          Nenhum comentário ainda. Seja o primeiro a compartilhar seus pensamentos!
         </div>
       ) : (
         <div className="space-y-4">

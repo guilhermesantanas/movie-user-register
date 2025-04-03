@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -133,19 +132,11 @@ export const useMoviesList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [usesSampleData, setUsesSampleData] = useState(false);
   
-  // Fetch movies from database or sample data
+  // Fetch movies from database only
   useEffect(() => {
     const fetchMovies = async () => {
       setIsLoading(true);
       try {
-        // Get the array of deleted sample movie IDs from localStorage
-        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
-        
-        // Filter out any sample movies that were previously deleted
-        const filteredSampleMovies = sampleMovies.filter(movie => 
-          !deletedSampleMovieIds.includes(movie.id)
-        );
-        
         // Fetch movies from Supabase
         const { data: authData } = await supabase.auth.getSession();
         const { data, error } = await supabase
@@ -157,37 +148,24 @@ export const useMoviesList = () => {
           throw error;
         }
         
-        // Check if we got any data from Supabase
-        if (data && data.length > 0) {
-          // Only use database movies, no sample movies
+        // Use database movies (we've added sample movies to the database)
+        if (data) {
           setMovies(data);
           setFilteredMovies(data);
           setUsesSampleData(false);
-          console.log('Movies loaded from database:', data);
+          console.log('Filmes carregados do banco de dados:', data);
         } else {
-          // If no movies are in the database, use filtered sample movies
-          console.log('No movies in database, using sample data');
-          setMovies(filteredSampleMovies);
-          setFilteredMovies(filteredSampleMovies);
-          setUsesSampleData(true);
-          toast.info('Showing sample movie data for demonstration purposes');
+          // This should not happen anymore since we've added movies to the database
+          setMovies([]);
+          setFilteredMovies([]);
+          setUsesSampleData(false);
+          toast.info('Nenhum filme encontrado no banco de dados');
         }
       } catch (error) {
-        console.error('Error fetching movies:', error);
-        
-        // Get the array of deleted sample movie IDs from localStorage
-        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
-        
-        // Filter out any sample movies that were previously deleted
-        const filteredSampleMovies = sampleMovies.filter(movie => 
-          !deletedSampleMovieIds.includes(movie.id)
-        );
-        
-        // Fallback to filtered sample data if there's an error
-        setMovies(filteredSampleMovies);
-        setFilteredMovies(filteredSampleMovies);
-        setUsesSampleData(true);
-        toast.error('Failed to load movies from database. Showing sample data instead.');
+        console.error('Erro ao buscar filmes:', error);
+        toast.error('Falha ao carregar filmes do banco de dados.');
+        setMovies([]);
+        setFilteredMovies([]);
       } finally {
         setIsLoading(false);
       }
@@ -216,30 +194,7 @@ export const useMoviesList = () => {
   
   const handleDeleteMovie = async (movieId: string) => {
     try {
-      // Check if it's a sample movie (starts with 'sample-')
-      if (movieId.startsWith('sample-')) {
-        // For sample movies, remove from local UI state
-        const updatedMovies = movies.filter(movie => movie.id !== movieId);
-        setMovies(updatedMovies);
-        setFilteredMovies(updatedMovies);
-        
-        // Add to deleted sample movie IDs in localStorage
-        const deletedSampleMovieIds = JSON.parse(localStorage.getItem('deletedSampleMovieIds') || '[]');
-        if (!deletedSampleMovieIds.includes(movieId)) {
-          deletedSampleMovieIds.push(movieId);
-          localStorage.setItem('deletedSampleMovieIds', JSON.stringify(deletedSampleMovieIds));
-        }
-        
-        // Also check if this movie is in localStorage as a viewed movie
-        const recentlyViewedMovies = JSON.parse(localStorage.getItem('recentlyViewedMovies') || '[]');
-        const updatedRecentlyViewed = recentlyViewedMovies.filter((movie: any) => movie.id !== movieId);
-        localStorage.setItem('recentlyViewedMovies', JSON.stringify(updatedRecentlyViewed));
-        
-        toast.success('Sample movie removed');
-        return;
-      }
-      
-      // For real database movies, delete from Supabase
+      // We only have database movies now, so always delete from Supabase
       const { error } = await supabase
         .from('movies')
         .delete()
@@ -259,10 +214,10 @@ export const useMoviesList = () => {
       const updatedRecentlyViewed = recentlyViewedMovies.filter((movie: any) => movie.id !== movieId);
       localStorage.setItem('recentlyViewedMovies', JSON.stringify(updatedRecentlyViewed));
       
-      toast.success('Movie deleted successfully');
+      toast.success('Filme excluído com sucesso');
     } catch (error) {
-      console.error('Error deleting movie:', error);
-      toast.error('Failed to delete movie. Please try again.');
+      console.error('Erro ao excluir filme:', error);
+      toast.error('Falha ao excluir filme. Por favor, tente novamente.');
     }
   };
   

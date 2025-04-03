@@ -42,7 +42,7 @@ const Movies = () => {
               label=""
               id="search"
               name="search"
-              placeholder="Search by title, director, or genre"
+              placeholder="Buscar por título, diretor ou gênero"
               value={searchTerm}
               onChange={handleSearch}
               icon={<Search size={18} />}

@@ -24,7 +24,7 @@ const MovieDetails = () => {
       <PageTransition>
         <div className="container max-w-6xl mx-auto py-10">
           <div className="flex justify-center items-center h-[60vh]">
-            <p className="text-lg">Loading movie details...</p>
+            <p className="text-lg">Carregando detalhes do filme...</p>
           </div>
         </div>
       </PageTransition>
@@ -36,8 +36,8 @@ const MovieDetails = () => {
       <PageTransition>
         <div className="container max-w-6xl mx-auto py-10">
           <div className="flex flex-col justify-center items-center h-[60vh]">
-            <p className="text-lg text-red-500 mb-4">{error || "Movie not found"}</p>
-            <Button onClick={() => navigate('/movies')}>Back to Movies</Button>
+            <p className="text-lg text-red-500 mb-4">{error || "Filme não encontrado"}</p>
+            <Button onClick={() => navigate('/movies')}>Voltar para Filmes</Button>
           </div>
         </div>
       </PageTransition>
