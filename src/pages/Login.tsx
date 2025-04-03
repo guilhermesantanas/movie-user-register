@@ -33,7 +33,7 @@ const Login = () => {
         localStorage.setItem('username', username);
         localStorage.setItem('userType', 'admin');
         
-        toast.success('Login successful as Admin!');
+        toast.success('Login realizado com sucesso como Administrador!');
         navigate('/movies');
         setIsSubmitting(false);
         return;
@@ -50,10 +50,10 @@ const Login = () => {
         localStorage.setItem('username', user.name);
         localStorage.setItem('userType', user.userType);
         
-        toast.success('Login successful!');
+        toast.success('Login realizado com sucesso!');
         navigate('/movies');
       } else {
-        toast.error('Invalid credentials');
+        toast.error('Credenciais inválidas');
       }
       
       setIsSubmitting(false);
@@ -70,7 +70,7 @@ const Login = () => {
             onClick={() => navigate('/')}
             icon={<ArrowLeft size={16} />}
           >
-            Back to Home
+            Voltar para Início
           </Button>
           
           <AppHeader 
@@ -86,10 +86,10 @@ const Login = () => {
           >
             <form onSubmit={handleSubmit}>
               <InputField
-                label="Username or Email"
+                label="Usuário ou Email"
                 id="username"
                 name="username"
-                placeholder="Enter your username or email"
+                placeholder="Digite seu usuário ou email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -97,11 +97,11 @@ const Login = () => {
               />
               
               <InputField
-                label="Password"
+                label="Senha"
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Digite sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -115,15 +115,15 @@ const Login = () => {
                   isLoading={isSubmitting}
                   icon={<LogIn size={18} />}
                 >
-                  Login
+                  Entrar
                 </Button>
                 
                 <p className="text-center text-sm text-muted-foreground mt-4">
-                  Don't have an account? <a href="/register-user" className="text-primary hover:underline">Register here</a>
+                  Não tem uma conta? <a href="/register-user" className="text-primary hover:underline">Registre-se aqui</a>
                 </p>
                 
                 <p className="text-center text-sm text-muted-foreground mt-2">
-                  Admin credentials: admin / admin123
+                  Credenciais de admin: admin / admin123
                 </p>
               </div>
             </form>

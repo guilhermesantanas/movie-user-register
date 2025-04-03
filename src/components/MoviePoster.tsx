@@ -1,6 +1,7 @@
 
 import React from 'react';
 import RatingStars from '@/components/RatingStars';
+import { toast } from 'sonner';
 
 interface MoviePosterProps {
   posterUrl: string;
@@ -23,6 +24,19 @@ const MoviePoster = ({
 }: MoviePosterProps) => {
   // Convert 10-scale rating to 5-scale for display
   const displayRating = averageRating / 2;
+  
+  const handleRateMovie = async (rating: number) => {
+    try {
+      if (!userLoggedIn) {
+        toast("Você precisa estar logado para avaliar este filme");
+        return;
+      }
+      
+      await onRateMovie(rating);
+    } catch (error) {
+      console.error('Error rating movie:', error);
+    }
+  };
   
   return (
     <div className="md:col-span-1">
@@ -53,8 +67,9 @@ const MoviePoster = ({
               <p className="text-sm mb-1">Sua Avaliação:</p>
               <RatingStars
                 currentRating={userRating ? userRating / 2 : 0}
-                onRatingChange={(rating) => onRateMovie(rating * 2)} // Convert 5-scale back to 10-scale
+                onRatingChange={(rating) => handleRateMovie(rating * 2)} // Convert 5-scale back to 10-scale
                 maxRating={5}
+                interactive={true}
               />
             </div>
           )}

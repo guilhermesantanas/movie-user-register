@@ -40,11 +40,12 @@ const UserRegistration = () => {
       localStorage.setItem('users', JSON.stringify(savedUsers));
       
       setIsSubmitting(false);
-      toast.success('User registered successfully!');
+      toast.success('Usuário registrado com sucesso!');
       
       // Automatically log in the new user
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('username', userData.name as string);
+      localStorage.setItem('userType', userData.userType as string);
       
       navigate('/');
     }, 1500);
@@ -60,12 +61,12 @@ const UserRegistration = () => {
             onClick={() => navigate('/')}
             icon={<ArrowLeft size={16} />}
           >
-            Back to Home
+            Voltar para Início
           </Button>
           
           <AppHeader 
             title="Cinema Management" 
-            subtitle="register account"
+            subtitle="criar conta"
           />
           
           <motion.div 
@@ -77,10 +78,10 @@ const UserRegistration = () => {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InputField
-                  label="Full Name"
+                  label="Nome Completo"
                   id="name"
                   name="name"
-                  placeholder="Enter your full name"
+                  placeholder="Digite seu nome completo"
                   required
                   icon={<User size={18} />}
                 />
@@ -90,31 +91,31 @@ const UserRegistration = () => {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder="Digite seu endereço de email"
                   required
                   icon={<Mail size={18} />}
                 />
                 
                 <InputField
-                  label="Phone Number"
+                  label="Telefone"
                   id="phone"
                   name="phone"
-                  placeholder="Enter your phone number"
+                  placeholder="Digite seu número de telefone"
                   icon={<Smartphone size={18} />}
                 />
                 
                 <InputField
-                  label="Password"
+                  label="Senha"
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="Create a strong password"
+                  placeholder="Crie uma senha forte"
                   required
                   icon={<Lock size={18} />}
                 />
                 
                 <InputField
-                  label="Date of Birth"
+                  label="Data de Nascimento"
                   id="dob"
                   name="dob"
                   type="date"
@@ -122,40 +123,40 @@ const UserRegistration = () => {
                 />
                 
                 <SelectField
-                  label="User Type"
+                  label="Tipo de Usuário"
                   id="userType"
                   name="userType"
                   options={[
-                    { value: "customer", label: "Customer" },
-                    { value: "admin", label: "Administrator" },
-                    { value: "staff", label: "Staff Member" }
+                    { value: "customer", label: "Cliente" },
+                    { value: "admin", label: "Administrador" },
+                    { value: "staff", label: "Funcionário" }
                   ]}
                   required
                   icon={<UserCheck size={18} />}
                 />
                 
                 <InputField
-                  label="City"
+                  label="Cidade"
                   id="city"
                   name="city"
-                  placeholder="Enter your city"
+                  placeholder="Digite sua cidade"
                   icon={<MapPin size={18} />}
                 />
                 
                 <SelectField
-                  label="Country"
+                  label="País"
                   id="country"
                   name="country"
                   options={[
-                    { value: "us", label: "United States" },
-                    { value: "ca", label: "Canada" },
-                    { value: "mx", label: "Mexico" },
-                    { value: "br", label: "Brazil" },
-                    { value: "fr", label: "France" },
-                    { value: "uk", label: "United Kingdom" },
-                    { value: "de", label: "Germany" },
-                    { value: "jp", label: "Japan" },
-                    { value: "au", label: "Australia" }
+                    { value: "us", label: "Estados Unidos" },
+                    { value: "ca", label: "Canadá" },
+                    { value: "mx", label: "México" },
+                    { value: "br", label: "Brasil" },
+                    { value: "fr", label: "França" },
+                    { value: "uk", label: "Reino Unido" },
+                    { value: "de", label: "Alemanha" },
+                    { value: "jp", label: "Japão" },
+                    { value: "au", label: "Austrália" }
                   ]}
                   icon={<MapPin size={18} />}
                 />
@@ -167,7 +168,7 @@ const UserRegistration = () => {
                   className="w-full" 
                   isLoading={isSubmitting}
                 >
-                  Register User
+                  Registrar Usuário
                 </Button>
               </div>
             </form>

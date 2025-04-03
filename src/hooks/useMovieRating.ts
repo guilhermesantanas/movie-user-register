@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
 
 interface UserRating {
   userRating: number | null;
@@ -9,7 +10,7 @@ interface UserRating {
 }
 
 export const useMovieRating = (movieId: string) => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [averageRating, setAverageRating] = useState<number>(0);
   const [ratingCount, setRatingCount] = useState<number>(0);
   const [user, setUser] = useState<any>(null);
@@ -21,17 +22,19 @@ export const useMovieRating = (movieId: string) => {
   useEffect(() => {
     const fetchUserAndRatings = async () => {
       try {
-        // Get current user
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser(session.user);
+        // Get current user from localStorage
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        
+        if (isLoggedIn) {
+          const username = localStorage.getItem('username');
+          setUser({ id: username });
           
           // Fetch user's rating for this movie if they're logged in
           const { data: userRatingData, error: userRatingError } = await supabase
             .from('movie_ratings')
             .select('*')
             .eq('movie_id', movieId)
-            .eq('user_id', session.user.id)
+            .eq('user_id', username)
             .maybeSingle();
             
           if (!userRatingError && userRatingData) {
@@ -63,11 +66,7 @@ export const useMovieRating = (movieId: string) => {
 
   const handleRateMovie = async (rating: number) => {
     if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to rate this movie",
-        variant: "destructive",
-      });
+      toast("Por favor, faça login para avaliar este filme");
       return;
     }
 
@@ -81,10 +80,7 @@ export const useMovieRating = (movieId: string) => {
           
         if (error) throw error;
         
-        toast({
-          title: "Rating Updated",
-          description: "Your rating has been updated",
-        });
+        toast("Sua avaliação foi atualizada");
       } else {
         // Insert new rating
         const { error } = await supabase
@@ -97,10 +93,7 @@ export const useMovieRating = (movieId: string) => {
           
         if (error) throw error;
         
-        toast({
-          title: "Rating Submitted",
-          description: "Thanks for rating this movie!",
-        });
+        toast("Obrigado por avaliar este filme!");
       }
 
       // Refresh ratings
@@ -124,11 +117,7 @@ export const useMovieRating = (movieId: string) => {
         }
       }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to submit rating",
-        variant: "destructive",
-      });
+      toast("Erro ao enviar avaliação: " + (error.message || "Falha desconhecida"));
     }
   };
 

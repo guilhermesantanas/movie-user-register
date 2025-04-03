@@ -16,7 +16,7 @@ const ProtectedRoute = ({
   
   useEffect(() => {
     if (!isLoggedIn) {
-      toast.error('You must be logged in to access this page');
+      toast.error('Você precisa estar logado para acessar esta página');
     }
   }, [isLoggedIn]);
 

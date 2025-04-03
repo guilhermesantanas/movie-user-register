@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Trash2, MessageSquare, Shield } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from 'sonner';
 
 interface Comment {
   id: string;
@@ -22,7 +23,7 @@ interface MovieCommentsProps {
 }
 
 const MovieComments = ({ movieId }: MovieCommentsProps) => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [user, setUser] = useState<any>(null);
@@ -31,30 +32,24 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState('');
 
-  // Fetch current user and admin status
+  // Setup user information from localStorage
   useEffect(() => {
-    const fetchUserAndCheckAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
+    const checkUserStatus = async () => {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      
+      if (isLoggedIn) {
+        const username = localStorage.getItem('username');
+        const userType = localStorage.getItem('userType');
         
-        // Get user's email from auth
-        const email = session.user.email;
-        if (email) {
-          // Use the part before @ as the username
-          setUserName(email.split('@')[0]);
-        }
-        
-        // Check if user is admin
-        const { data } = await supabase
-          .rpc('is_admin', { user_id: session.user.id });
-        
-        setIsAdmin(!!data);
+        setUser({ id: username });
+        setUserName(username || 'Usuário');
+        setIsAdmin(userType === 'admin');
       }
+      
       setLoading(false);
     };
 
-    fetchUserAndCheckAdmin();
+    checkUserStatus();
   }, []);
 
   // Fetch comments
@@ -69,7 +64,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         
       if (error) {
         console.error('Erro ao buscar comentários:', error);
-        toast({
+        uiToast({
           title: "Erro",
           description: "Falha ao carregar comentários",
           variant: "destructive",
@@ -101,24 +96,16 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     return () => {
       commentsSubscription.unsubscribe();
     };
-  }, [movieId, toast]);
+  }, [movieId, uiToast]);
 
   const handleAddComment = async () => {
     if (!user) {
-      toast({
-        title: "Autenticação Necessária",
-        description: "Por favor, faça login para adicionar um comentário",
-        variant: "destructive",
-      });
+      toast("Por favor, faça login para adicionar um comentário");
       return;
     }
 
     if (!newComment.trim()) {
-      toast({
-        title: "Comentário Vazio",
-        description: "Por favor, digite algum texto para seu comentário",
-        variant: "destructive",
-      });
+      toast("Por favor, digite algum texto para seu comentário");
       return;
     }
 
@@ -136,18 +123,11 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         
       if (error) throw error;
       
-      toast({
-        title: "Comentário Adicionado",
-        description: "Seu comentário foi publicado",
-      });
+      toast("Seu comentário foi publicado");
       
       setNewComment('');
     } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Falha ao publicar comentário",
-        variant: "destructive",
-      });
+      toast("Falha ao publicar comentário: " + (error.message || "Erro desconhecido"));
     } finally {
       setSubmitting(false);
     }
@@ -160,11 +140,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     const canDelete = isAdmin || user.id === commentUserId;
     
     if (!canDelete) {
-      toast({
-        title: "Permissão Negada",
-        description: "Você só pode excluir seus próprios comentários",
-        variant: "destructive",
-      });
+      toast("Você só pode excluir seus próprios comentários");
       return;
     }
     
@@ -176,19 +152,12 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         
       if (error) throw error;
       
-      toast({
-        title: "Comentário Excluído",
-        description: "O comentário foi removido",
-      });
+      toast("O comentário foi removido");
       
       // Update the local state
       setComments(comments.filter(comment => comment.id !== commentId));
     } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Falha ao excluir comentário",
-        variant: "destructive",
-      });
+      toast("Falha ao excluir comentário: " + (error.message || "Erro desconhecido"));
     }
   };
 
