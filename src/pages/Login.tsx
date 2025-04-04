@@ -60,6 +60,9 @@ const Login = () => {
     }, 1000);
   };
   
+  // Check if user is already logged in
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  
   return (
     <PageTransition>
       <div className="min-h-screen py-12 px-6 flex items-center justify-center">
@@ -84,49 +87,72 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <form onSubmit={handleSubmit}>
-              <InputField
-                label="Usuário ou Email"
-                id="username"
-                name="username"
-                placeholder="Digite seu usuário ou email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                icon={<User size={18} />}
-              />
-              
-              <InputField
-                label="Senha"
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                icon={<Lock size={18} />}
-              />
-              
-              <div className="mt-6">
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  isLoading={isSubmitting}
-                  icon={<LogIn size={18} />}
-                >
-                  Entrar
-                </Button>
-                
-                <p className="text-center text-sm text-muted-foreground mt-4">
-                  Não tem uma conta? <a href="/register-user" className="text-primary hover:underline">Registre-se aqui</a>
-                </p>
-                
-                <p className="text-center text-sm text-muted-foreground mt-2">
-                  Credenciais de admin: admin / admin123
-                </p>
+            {isLoggedIn ? (
+              <div className="text-center">
+                <p className="mb-4">Você já está logado como {localStorage.getItem('username')}</p>
+                <div className="flex flex-col gap-3">
+                  <Button onClick={() => navigate('/profile')}>
+                    Ir para Meu Perfil
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      localStorage.removeItem('isLoggedIn');
+                      localStorage.removeItem('username');
+                      localStorage.removeItem('userType');
+                      toast.success('Logout realizado com sucesso!');
+                      navigate('/login');
+                    }}
+                  >
+                    Sair da conta
+                  </Button>
+                </div>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <InputField
+                  label="Usuário ou Email"
+                  id="username"
+                  name="username"
+                  placeholder="Digite seu usuário ou email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  icon={<User size={18} />}
+                />
+                
+                <InputField
+                  label="Senha"
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Digite sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  icon={<Lock size={18} />}
+                />
+                
+                <div className="mt-6">
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    isLoading={isSubmitting}
+                    icon={<LogIn size={18} />}
+                  >
+                    Entrar
+                  </Button>
+                  
+                  <p className="text-center text-sm text-muted-foreground mt-4">
+                    Não tem uma conta? <a href="/register-user" className="text-primary hover:underline">Registre-se aqui</a>
+                  </p>
+                  
+                  <p className="text-center text-sm text-muted-foreground mt-2">
+                    Credenciais de admin: admin / admin123
+                  </p>
+                </div>
+              </form>
+            )}
           </motion.div>
         </div>
       </div>

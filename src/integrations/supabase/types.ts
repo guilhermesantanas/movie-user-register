@@ -217,6 +217,45 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          updated_at: string
+          user_type: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_type?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_type?: string | null
+        }
+        Relationships: []
+      }
       streaming: {
         Row: {
           disponibilidade: boolean
