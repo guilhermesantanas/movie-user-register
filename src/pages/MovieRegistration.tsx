@@ -58,6 +58,11 @@ const MovieRegistration: React.FC = () => {
         registered_by: session.user.email
       };
 
+      // Ensure title is not undefined (it's required by the database)
+      if (!movieToInsert.title) {
+        throw new Error("Movie title is required");
+      }
+
       const { data, error } = await supabase
         .from('movies')
         .insert(movieToInsert)
