@@ -76,7 +76,7 @@ const MovieInfo = ({ movie }: MovieInfoProps) => {
       
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Synopsis</h3>
-        <p className="text-gray-700 dark:text-gray-300">
+        <p className="text-foreground">
           {movie.synopsis || 'No synopsis available.'}
         </p>
       </div>

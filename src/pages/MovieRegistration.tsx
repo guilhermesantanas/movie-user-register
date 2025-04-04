@@ -53,12 +53,14 @@ const MovieRegistration: React.FC = () => {
       }
 
       // Insert movie into Supabase
+      const movieToInsert = {
+        ...validatedData,
+        registered_by: session.user.email
+      };
+
       const { data, error } = await supabase
         .from('movies')
-        .insert({
-          ...validatedData,
-          registered_by: session.user.email
-        })
+        .insert(movieToInsert)
         .select();
 
       if (error) throw error;

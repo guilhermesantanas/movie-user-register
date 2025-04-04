@@ -9,6 +9,7 @@ interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement>
   options: { value: string; label: string }[];
   error?: string;
   icon?: React.ReactNode;
+  placeholder?: string;
 }
 
 const SelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
