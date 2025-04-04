@@ -32,9 +32,12 @@ const MoviePoster = ({
         return;
       }
       
+      // Pass the rating to the parent component's handler
       await onRateMovie(rating);
+      
     } catch (error) {
-      console.error('Error rating movie:', error);
+      console.error('Erro ao avaliar filme:', error);
+      toast("Ocorreu um erro ao enviar sua avaliação");
     }
   };
   

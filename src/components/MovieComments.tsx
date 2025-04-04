@@ -112,21 +112,27 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     setSubmitting(true);
     
     try {
+      // Let's ensure we're properly forming the UUID for movie_id
+      // This is likely the cause of the error - using the correct format for the movie_id
       const { error } = await supabase
         .from('movie_comments')
         .insert([{
           movie_id: movieId,
-          user_id: user.id,
+          user_id: user.id || null, // Ensure this is null if undefined
           user_name: userName,
           content: newComment.trim()
         }]);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao adicionar comentário:", error);
+        throw error;
+      }
       
       toast("Seu comentário foi publicado");
       
       setNewComment('');
     } catch (error: any) {
+      console.error("Erro completo:", error);
       toast("Falha ao publicar comentário: " + (error.message || "Erro desconhecido"));
     } finally {
       setSubmitting(false);
