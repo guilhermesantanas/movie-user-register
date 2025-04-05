@@ -22,24 +22,28 @@ const useSessionPersistence = () => {
     
     // Check session persistence based on rememberMe
     const checkSessionExpiration = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const rememberMe = localStorage.getItem('rememberMe') === 'true';
-      
-      // If there's a session but "Remember Me" is false, enforce shorter session
-      if (session && !rememberMe) {
-        const lastActivity = localStorage.getItem('lastActivityTime');
-        const now = new Date().getTime();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const rememberMe = localStorage.getItem('rememberMe') === 'true';
         
-        // If last activity was more than 30 minutes ago, log user out
-        if (lastActivity && now - parseInt(lastActivity) > 30 * 60 * 1000) {
-          await supabase.auth.signOut();
-          navigate('/login');
+        // If there's a session but "Remember Me" is false, enforce shorter session
+        if (session && !rememberMe) {
+          const lastActivity = localStorage.getItem('lastActivityTime');
+          const now = new Date().getTime();
+          
+          // If last activity was more than 30 minutes ago, log user out
+          if (lastActivity && now - parseInt(lastActivity) > 30 * 60 * 1000) {
+            await supabase.auth.signOut();
+            navigate('/login');
+          }
         }
-      }
-      
-      // Update last activity time if logged in
-      if (session) {
-        localStorage.setItem('lastActivityTime', new Date().getTime().toString());
+        
+        // Update last activity time if logged in
+        if (session) {
+          localStorage.setItem('lastActivityTime', new Date().getTime().toString());
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
       }
     };
     
@@ -51,8 +55,7 @@ const useSessionPersistence = () => {
     
     // Track user activity
     const updateActivity = () => {
-      const { data: { session } } = supabase.auth.getSession();
-      if (session) {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
         localStorage.setItem('lastActivityTime', new Date().getTime().toString());
       }
     };
