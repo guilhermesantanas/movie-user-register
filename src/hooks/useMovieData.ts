@@ -2,21 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-export interface Movie {
-  id: string;
-  title: string;
-  director: string;
-  genre: string;
-  release_date: string;
-  duration: number;
-  imdb_rating: number;
-  language: string;
-  rating: string;
-  synopsis: string;
-  poster_url: string;
-  trailer_url: string;
-}
+import { Movie } from '@/types/movies';
 
 export const useMovieData = (movieId: string | undefined) => {
   const { toast } = useToast();
@@ -38,7 +24,7 @@ export const useMovieData = (movieId: string | undefined) => {
           .from('movies')
           .select('*')
           .eq('id', movieId)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no rows are returned
           
         if (error) throw error;
         

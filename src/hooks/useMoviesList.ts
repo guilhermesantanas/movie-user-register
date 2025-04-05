@@ -1,8 +1,13 @@
 
+import { useState } from 'react';
 import { useMoviesData } from './useMoviesData';
 import { useMoviesSearch } from './useMoviesSearch';
 import { useMovieManagement } from './useMovieManagement';
 
+/**
+ * Hook to manage the movies list, including fetching,
+ * searching, and deletion functionality
+ */
 export const useMoviesList = () => {
   const { movies, setMovies, isLoading } = useMoviesData();
   const { searchTerm, filteredMovies, handleSearch } = useMoviesSearch(movies);
@@ -12,7 +17,6 @@ export const useMoviesList = () => {
     movies,
     filteredMovies,
     isLoading,
-    usesSampleData: false, // Always false now that we use Supabase
     searchTerm,
     handleSearch,
     handleDeleteMovie

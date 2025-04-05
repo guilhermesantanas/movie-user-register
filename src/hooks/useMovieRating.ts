@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { toast } from 'sonner';
 
 interface UserRating {
@@ -10,7 +9,6 @@ interface UserRating {
 }
 
 export const useMovieRating = (movieId: string) => {
-  const { toast: uiToast } = useToast();
   const [averageRating, setAverageRating] = useState<number>(0);
   const [ratingCount, setRatingCount] = useState<number>(0);
   const [user, setUser] = useState<any>(null);
@@ -22,19 +20,18 @@ export const useMovieRating = (movieId: string) => {
   useEffect(() => {
     const fetchUserAndRatings = async () => {
       try {
-        // Get current user from localStorage
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        // First check if user is logged in using Supabase
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (isLoggedIn) {
-          const username = localStorage.getItem('username');
-          setUser({ id: username });
+        if (session?.user) {
+          setUser({ id: session.user.id });
           
           // Fetch user's rating for this movie if they're logged in
           const { data: userRatingData, error: userRatingError } = await supabase
             .from('movie_ratings')
             .select('*')
             .eq('movie_id', movieId)
-            .eq('user_id', username)
+            .eq('user_id', session.user.id)
             .maybeSingle();
             
           if (!userRatingError && userRatingData) {
@@ -65,12 +62,17 @@ export const useMovieRating = (movieId: string) => {
   }, [movieId]);
 
   const handleRateMovie = async (rating: number) => {
-    if (!user) {
+    // First check if user is logged in using Supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.user) {
       toast("Por favor, faça login para avaliar este filme");
       return;
     }
 
     try {
+      const userId = session.user.id;
+      
       if (userRating.userRatingId) {
         // Update existing rating
         const { error } = await supabase
@@ -87,7 +89,7 @@ export const useMovieRating = (movieId: string) => {
           .from('movie_ratings')
           .insert({ 
             movie_id: movieId,
-            user_id: user.id,
+            user_id: userId,
             rating 
           });
           
@@ -108,7 +110,7 @@ export const useMovieRating = (movieId: string) => {
         setRatingCount(ratingsData.length);
         
         // Update user rating in state
-        const userRatingData = ratingsData.find(item => item.user_id === user.id);
+        const userRatingData = ratingsData.find(item => item.user_id === userId);
         if (userRatingData) {
           setUserRating({
             userRating: userRatingData.rating,

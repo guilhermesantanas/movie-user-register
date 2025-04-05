@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 /**
  * Hook to manage session persistence based on Supabase auth and "Remember Me" setting
@@ -16,6 +17,10 @@ const useSessionPersistence = () => {
         if (event === 'SIGNED_OUT') {
           // Clear any local storage items when user signs out
           localStorage.removeItem('rememberMe');
+          localStorage.removeItem('lastActivityTime');
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('username');
+          localStorage.removeItem('userType');
         }
       }
     );
@@ -34,6 +39,7 @@ const useSessionPersistence = () => {
           // If last activity was more than 30 minutes ago, log user out
           if (lastActivity && now - parseInt(lastActivity) > 30 * 60 * 1000) {
             await supabase.auth.signOut();
+            toast('Your session has expired. Please log in again.');
             navigate('/login');
           }
         }
@@ -53,7 +59,7 @@ const useSessionPersistence = () => {
     // Set up interval and event listeners
     const activityInterval = setInterval(checkSessionExpiration, 60000);
     
-    // Track user activity
+    // Track user activity with a single function to avoid duplication
     const updateActivity = () => {
       if (localStorage.getItem('isLoggedIn') === 'true') {
         localStorage.setItem('lastActivityTime', new Date().getTime().toString());
