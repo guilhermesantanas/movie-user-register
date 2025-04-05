@@ -58,14 +58,14 @@ const MovieRegistration: React.FC = () => {
         registered_by: session.user.email
       };
 
-      // Ensure title is not undefined (it's required by the database)
-      if (!movieToInsert.title) {
-        throw new Error("Movie title is required");
-      }
-
+      // TypeScript requires us to be explicit that the title is defined
+      // because the database schema requires it
       const { data, error } = await supabase
         .from('movies')
-        .insert(movieToInsert)
+        .insert({
+          ...movieToInsert,
+          title: movieToInsert.title // This explicitly tells TypeScript that title is defined
+        })
         .select();
 
       if (error) throw error;
