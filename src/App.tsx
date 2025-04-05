@@ -12,12 +12,47 @@ import MovieRegistration from "./pages/MovieRegistration";
 import Movies from "./pages/Movies";
 import MovieDetails from "./pages/MovieDetails";
 import Login from "./pages/Login";
-import UserProfile from "./pages/UserProfile"; // Import the new page
+import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import useSessionPersistence from "./hooks/useSessionPersistence";
 
 // Create a client
 const queryClient = new QueryClient();
+
+// App wrapper to use hooks
+const AppWithHooks = () => {
+  useSessionPersistence();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/register-user" element={<UserRegistration />} />
+        <Route 
+          path="/register-movie" 
+          element={
+            <ProtectedRoute>
+              <MovieRegistration />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/login" element={<Login />} />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 const App = () => (
   <React.StrictMode>
@@ -26,32 +61,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/register-user" element={<UserRegistration />} />
-              <Route 
-                path="/register-movie" 
-                element={
-                  <ProtectedRoute>
-                    <MovieRegistration />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="/movies" element={<Movies />} />
-              <Route path="/movie/:id" element={<MovieDetails />} />
-              <Route path="/login" element={<Login />} />
-              <Route 
-                path="/profile" 
-                element={
-                  <ProtectedRoute>
-                    <UserProfile />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
+          <AppWithHooks />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

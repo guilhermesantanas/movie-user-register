@@ -9,6 +9,8 @@ import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
 
 // Admin credentials
 const ADMIN_USERNAME = "admin";
@@ -18,6 +20,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,6 +35,13 @@ const Login = () => {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('userType', 'admin');
+        
+        // Set session persistence based on rememberMe
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          localStorage.setItem('rememberMe', 'false');
+        }
         
         toast.success('Login realizado com sucesso como Administrador!');
         navigate('/movies');
@@ -49,6 +59,13 @@ const Login = () => {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', user.name);
         localStorage.setItem('userType', user.userType);
+        
+        // Set session persistence based on rememberMe
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          localStorage.setItem('rememberMe', 'false');
+        }
         
         toast.success('Login realizado com sucesso!');
         navigate('/movies');
@@ -100,6 +117,7 @@ const Login = () => {
                       localStorage.removeItem('isLoggedIn');
                       localStorage.removeItem('username');
                       localStorage.removeItem('userType');
+                      localStorage.removeItem('rememberMe');
                       toast.success('Logout realizado com sucesso!');
                       navigate('/login');
                     }}
@@ -132,6 +150,20 @@ const Login = () => {
                   required
                   icon={<Lock size={18} />}
                 />
+                
+                <div className="flex items-center space-x-2 mt-4">
+                  <Checkbox 
+                    id="rememberMe" 
+                    checked={rememberMe} 
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  />
+                  <label 
+                    htmlFor="rememberMe" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Manter-me conectado
+                  </label>
+                </div>
                 
                 <div className="mt-6">
                   <Button 
