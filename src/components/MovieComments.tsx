@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -32,21 +31,28 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState('');
 
-  // Setup user information from localStorage
+  // Setup user information from Supabase
   useEffect(() => {
     const checkUserStatus = async () => {
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      
-      if (isLoggedIn) {
-        const username = localStorage.getItem('username');
-        const userType = localStorage.getItem('userType');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         
-        setUser({ id: username });
-        setUserName(username || 'Usuário');
-        setIsAdmin(userType === 'admin');
+        if (session?.user) {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          setUser(session.user);
+          setUserName(profileData?.name || session.user.email || 'Usuário');
+          setIsAdmin(profileData?.user_type === 'admin');
+        }
+      } catch (error) {
+        toast.error('Erro ao carregar informações do usuário');
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     checkUserStatus();
@@ -56,23 +62,25 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
   useEffect(() => {
     const fetchComments = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('movie_comments')
-        .select('*')
-        .eq('movie_id', movieId)
-        .order('created_at', { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from('movie_comments')
+          .select('*')
+          .eq('movie_id', movieId)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
         
-      if (error) {
-        console.error('Erro ao buscar comentários:', error);
+        setComments(data || []);
+      } catch (error) {
         uiToast({
           title: "Erro",
           description: "Falha ao carregar comentários",
           variant: "destructive",
         });
-      } else {
-        setComments(data || []);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchComments();
@@ -112,27 +120,20 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     setSubmitting(true);
     
     try {
-      // Let's ensure we're properly forming the UUID for movie_id
-      // This is likely the cause of the error - using the correct format for the movie_id
       const { error } = await supabase
         .from('movie_comments')
         .insert([{
           movie_id: movieId,
-          user_id: user.id || null, // Ensure this is null if undefined
+          user_id: user.id,
           user_name: userName,
           content: newComment.trim()
         }]);
         
-      if (error) {
-        console.error("Erro ao adicionar comentário:", error);
-        throw error;
-      }
+      if (error) throw error;
       
       toast("Seu comentário foi publicado");
-      
       setNewComment('');
     } catch (error: any) {
-      console.error("Erro completo:", error);
       toast("Falha ao publicar comentário: " + (error.message || "Erro desconhecido"));
     } finally {
       setSubmitting(false);

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Lock, LogIn } from 'lucide-react';
@@ -12,73 +12,68 @@ import Button from '@/components/Button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 
-// Admin credentials
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
-
 const Login = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
   
-  const handleSubmit = (e: React.FormEvent) => {
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsLoggedIn(true);
+        const { data: { user: userData } } = await supabase.auth.getUser();
+        setUsername(userData?.user_metadata?.name || userData?.email || 'Usuário');
+      }
+    };
+    
+    checkSession();
+  }, []);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simple login validation
-    setTimeout(() => {
-      // First check if it's the admin
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        // Store login state in localStorage
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', username);
-        localStorage.setItem('userType', 'admin');
-        
-        // Set session persistence based on rememberMe
-        if (rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-        } else {
-          localStorage.setItem('rememberMe', 'false');
-        }
-        
-        toast.success('Login realizado com sucesso como Administrador!');
-        navigate('/movies');
-        setIsSubmitting(false);
-        return;
-      }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
       
-      // If not admin, check registered users
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find((u: any) => 
-        (u.name === username || u.email === username) && u.password === password
-      );
+      if (error) throw error;
       
-      if (user) {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', user.name);
-        localStorage.setItem('userType', user.userType);
-        
-        // Set session persistence based on rememberMe
-        if (rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-        } else {
-          localStorage.setItem('rememberMe', 'false');
-        }
-        
-        toast.success('Login realizado com sucesso!');
-        navigate('/movies');
+      // Set session persistence based on rememberMe
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
       } else {
-        toast.error('Credenciais inválidas');
+        localStorage.setItem('rememberMe', 'false');
       }
       
+      toast.success('Login realizado com sucesso!');
+      navigate('/movies');
+    } catch (error: any) {
+      toast.error(error.message || 'Credenciais inválidas');
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
   
-  // Check if user is already logged in
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      localStorage.removeItem('rememberMe');
+      toast.success('Logout realizado com sucesso!');
+      setIsLoggedIn(false);
+      navigate('/login');
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao fazer logout');
+    }
+  };
   
   return (
     <PageTransition>
@@ -106,21 +101,14 @@ const Login = () => {
           >
             {isLoggedIn ? (
               <div className="text-center">
-                <p className="mb-4">Você já está logado como {localStorage.getItem('username')}</p>
+                <p className="mb-4">Você já está logado como {username}</p>
                 <div className="flex flex-col gap-3">
                   <Button onClick={() => navigate('/profile')}>
                     Ir para Meu Perfil
                   </Button>
                   <Button 
                     variant="outline" 
-                    onClick={() => {
-                      localStorage.removeItem('isLoggedIn');
-                      localStorage.removeItem('username');
-                      localStorage.removeItem('userType');
-                      localStorage.removeItem('rememberMe');
-                      toast.success('Logout realizado com sucesso!');
-                      navigate('/login');
-                    }}
+                    onClick={handleLogout}
                   >
                     Sair da conta
                   </Button>
@@ -129,12 +117,13 @@ const Login = () => {
             ) : (
               <form onSubmit={handleSubmit}>
                 <InputField
-                  label="Usuário ou Email"
-                  id="username"
-                  name="username"
-                  placeholder="Digite seu usuário ou email"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  label="Email"
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Digite seu email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   icon={<User size={18} />}
                 />
@@ -177,10 +166,6 @@ const Login = () => {
                   
                   <p className="text-center text-sm text-muted-foreground mt-4">
                     Não tem uma conta? <a href="/register-user" className="text-primary hover:underline">Registre-se aqui</a>
-                  </p>
-                  
-                  <p className="text-center text-sm text-muted-foreground mt-2">
-                    Credenciais de admin: admin / admin123
                   </p>
                 </div>
               </form>

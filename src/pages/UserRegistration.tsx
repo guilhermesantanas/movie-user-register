@@ -10,45 +10,69 @@ import AppHeader from '@/components/AppHeader';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';
 import SelectField from '@/components/SelectField';
+import { supabase } from '@/integrations/supabase/client';
 
 const UserRegistration = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    dob: '',
+    userType: 'customer',
+    city: '',
+    country: ''
+  });
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Get form data
-    const formData = new FormData(e.target as HTMLFormElement);
-    const userData = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      password: formData.get('password'),
-      dob: formData.get('dob'),
-      userType: formData.get('userType'),
-      city: formData.get('city'),
-      country: formData.get('country')
-    };
-    
-    // Simulate form submission - in a real app, you'd save to a database
-    setTimeout(() => {
-      // Save to localStorage for demo purposes
-      const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      savedUsers.push(userData);
-      localStorage.setItem('users', JSON.stringify(savedUsers));
+    try {
+      // Register user with Supabase auth
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            userType: formData.userType
+          }
+        }
+      });
       
-      setIsSubmitting(false);
+      if (error) throw error;
+      
+      // Create profile entry in profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: data.user?.id,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          birth_date: formData.dob,
+          city: formData.city,
+          country: formData.country,
+          user_type: formData.userType
+        });
+      
+      if (profileError) throw profileError;
+      
       toast.success('Usuário registrado com sucesso!');
-      
-      // Automatically log in the new user
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', userData.name as string);
-      localStorage.setItem('userType', userData.userType as string);
-      
       navigate('/');
-    }, 1500);
+    } catch (error: any) {
+      toast.error(`Erro ao registrar usuário: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -83,6 +107,8 @@ const UserRegistration = () => {
                   name="name"
                   placeholder="Digite seu nome completo"
                   required
+                  value={formData.name}
+                  onChange={handleChange}
                   icon={<User size={18} />}
                 />
                 
@@ -93,6 +119,8 @@ const UserRegistration = () => {
                   type="email"
                   placeholder="Digite seu endereço de email"
                   required
+                  value={formData.email}
+                  onChange={handleChange}
                   icon={<Mail size={18} />}
                 />
                 
@@ -101,6 +129,8 @@ const UserRegistration = () => {
                   id="phone"
                   name="phone"
                   placeholder="Digite seu número de telefone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   icon={<Smartphone size={18} />}
                 />
                 
@@ -111,6 +141,8 @@ const UserRegistration = () => {
                   type="password"
                   placeholder="Crie uma senha forte"
                   required
+                  value={formData.password}
+                  onChange={handleChange}
                   icon={<Lock size={18} />}
                 />
                 
@@ -119,6 +151,8 @@ const UserRegistration = () => {
                   id="dob"
                   name="dob"
                   type="date"
+                  value={formData.dob}
+                  onChange={handleChange}
                   icon={<Calendar size={18} />}
                 />
                 
@@ -132,6 +166,8 @@ const UserRegistration = () => {
                     { value: "staff", label: "Funcionário" }
                   ]}
                   required
+                  value={formData.userType}
+                  onChange={handleChange}
                   icon={<UserCheck size={18} />}
                 />
                 
@@ -140,6 +176,8 @@ const UserRegistration = () => {
                   id="city"
                   name="city"
                   placeholder="Digite sua cidade"
+                  value={formData.city}
+                  onChange={handleChange}
                   icon={<MapPin size={18} />}
                 />
                 
@@ -147,7 +185,10 @@ const UserRegistration = () => {
                   label="País"
                   id="country"
                   name="country"
+                  value={formData.country}
+                  onChange={handleChange}
                   options={[
+                    { value: "", label: "Selecione um país" },
                     { value: "us", label: "Estados Unidos" },
                     { value: "ca", label: "Canadá" },
                     { value: "mx", label: "México" },
