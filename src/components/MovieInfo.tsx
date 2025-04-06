@@ -10,8 +10,8 @@ interface MovieInfoProps {
     genre: string;
     release_date: string;
     duration: number;
-    language: string;
-    imdb_rating: number;
+    language?: string;  // Changed to optional
+    imdb_rating?: number; // Changed to optional
     synopsis: string;
     trailer_url?: string;
   };

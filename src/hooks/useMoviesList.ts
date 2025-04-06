@@ -12,6 +12,8 @@ export const useMoviesList = () => {
   const { movies, setMovies, isLoading } = useMoviesData();
   const { searchTerm, filteredMovies, handleSearch } = useMoviesSearch(movies);
   const { handleDeleteMovie } = useMovieManagement(movies, setMovies);
+  // Adding usesSampleData property (default to false since we're using real Supabase data)
+  const usesSampleData = false;
   
   return {
     movies,
@@ -19,6 +21,7 @@ export const useMoviesList = () => {
     isLoading,
     searchTerm,
     handleSearch,
-    handleDeleteMovie
+    handleDeleteMovie,
+    usesSampleData
   };
 };
