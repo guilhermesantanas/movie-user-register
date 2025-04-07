@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Calendar, MapPin, ArrowLeft, UserCheck, Smartphone } from 'lucide-react';
+import { User, Mail, Lock, Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 import PageTransition from '@/components/PageTransition';
@@ -18,11 +18,8 @@ const UserRegistration = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     password: '',
     dob: '',
-    userType: 'customer',
-    city: '',
     country: ''
   });
   
@@ -42,8 +39,7 @@ const UserRegistration = () => {
         password: formData.password,
         options: {
           data: {
-            name: formData.name,
-            userType: formData.userType
+            name: formData.name
           }
         }
       });
@@ -57,11 +53,9 @@ const UserRegistration = () => {
           id: data.user?.id,
           name: formData.name,
           email: formData.email,
-          phone: formData.phone,
           birth_date: formData.dob,
-          city: formData.city,
           country: formData.country,
-          user_type: formData.userType
+          user_type: 'customer' // Default to customer
         });
       
       if (profileError) throw profileError;
@@ -125,16 +119,6 @@ const UserRegistration = () => {
                 />
                 
                 <InputField
-                  label="Telefone"
-                  id="phone"
-                  name="phone"
-                  placeholder="Digite seu número de telefone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  icon={<Smartphone size={18} />}
-                />
-                
-                <InputField
                   label="Senha"
                   id="password"
                   name="password"
@@ -154,31 +138,6 @@ const UserRegistration = () => {
                   value={formData.dob}
                   onChange={handleChange}
                   icon={<Calendar size={18} />}
-                />
-                
-                <SelectField
-                  label="Tipo de Usuário"
-                  id="userType"
-                  name="userType"
-                  options={[
-                    { value: "customer", label: "Cliente" },
-                    { value: "admin", label: "Administrador" },
-                    { value: "staff", label: "Funcionário" }
-                  ]}
-                  required
-                  value={formData.userType}
-                  onChange={handleChange}
-                  icon={<UserCheck size={18} />}
-                />
-                
-                <InputField
-                  label="Cidade"
-                  id="city"
-                  name="city"
-                  placeholder="Digite sua cidade"
-                  value={formData.city}
-                  onChange={handleChange}
-                  icon={<MapPin size={18} />}
                 />
                 
                 <SelectField
