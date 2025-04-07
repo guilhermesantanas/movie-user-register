@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Calendar, MapPin, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Calendar, MapPin, ArrowLeft, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 import PageTransition from '@/components/PageTransition';
@@ -11,6 +11,8 @@ import InputField from '@/components/InputField';
 import Button from '@/components/Button';
 import SelectField from '@/components/SelectField';
 import { supabase } from '@/integrations/supabase/client';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 const UserRegistration = () => {
   const navigate = useNavigate();
@@ -23,6 +25,8 @@ const UserRegistration = () => {
     country: ''
   });
   
+  const [userConsent, setUserConsent] = useState(false);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -30,6 +34,12 @@ const UserRegistration = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!userConsent) {
+      toast.error('Você precisa concordar com os termos e condições para continuar.');
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -160,6 +170,25 @@ const UserRegistration = () => {
                   ]}
                   icon={<MapPin size={18} />}
                 />
+              </div>
+              
+              <div className="mt-6 flex items-start space-x-2">
+                <Checkbox 
+                  id="terms" 
+                  checked={userConsent}
+                  onCheckedChange={(checked) => setUserConsent(checked === true)}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label 
+                    htmlFor="terms" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Eu concordo com os termos e condições de uso do serviço
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Ao se cadastrar, você concorda com nossa política de privacidade e termos de uso.
+                  </p>
+                </div>
               </div>
               
               <div className="mt-6">
