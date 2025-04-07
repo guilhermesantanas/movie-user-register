@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Changed from email to identifier
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,11 +40,38 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      // Determine if the identifier is an email (contains @) or username
+      const isEmail = identifier.includes('@');
       
+      let authResponse;
+      
+      if (isEmail) {
+        // Login with email
+        authResponse = await supabase.auth.signInWithPassword({
+          email: identifier,
+          password
+        });
+      } else {
+        // For username login, we need a different approach since Supabase doesn't directly support username auth
+        // First, query the profiles table to find the email associated with the username
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('name', identifier)
+          .single();
+          
+        if (profileError || !profileData?.email) {
+          throw new Error('Usuário não encontrado');
+        }
+        
+        // Now login with the retrieved email
+        authResponse = await supabase.auth.signInWithPassword({
+          email: profileData.email,
+          password
+        });
+      }
+      
+      const { error } = authResponse;
       if (error) throw error;
       
       // Set session persistence based on rememberMe
@@ -117,13 +144,13 @@ const Login = () => {
             ) : (
               <form onSubmit={handleSubmit}>
                 <InputField
-                  label="Email"
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Digite seu email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  label="Email ou Nome de Usuário"
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  placeholder="Digite seu email ou nome de usuário"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
                   icon={<User size={18} />}
                 />
