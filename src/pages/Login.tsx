@@ -40,6 +40,24 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
+      // Special case for admin user
+      if (identifier === 'admin' && password === 'admin123') {
+        // Use hardcoded admin email or create a session directly
+        const adminEmail = 'admin@example.com'; // Use whatever email is associated with admin
+        
+        const authResponse = await supabase.auth.signInWithPassword({
+          email: adminEmail,
+          password
+        });
+        
+        const { error } = authResponse;
+        if (error) throw error;
+        
+        toast.success('Login administrativo realizado com sucesso!');
+        navigate('/movies');
+        return;
+      }
+      
       // Determine if the identifier is an email (contains @) or username
       const isEmail = identifier.includes('@');
       
