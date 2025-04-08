@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Calendar, MapPin, ArrowLeft, CheckSquare } from 'lucide-react';
+import { User, Mail, Lock, Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 import PageTransition from '@/components/PageTransition';
@@ -13,9 +13,11 @@ import SelectField from '@/components/SelectField';
 import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
 
 const UserRegistration = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -39,22 +41,37 @@ const UserRegistration = () => {
       toast.error('Você precisa concordar com os termos e condições para continuar.');
       return;
     }
+
+    // Validate email
+    if (!formData.email.includes('@')) {
+      toast.error('Por favor, insira um email válido');
+      return;
+    }
+
+    // Validate password
+    if (formData.password.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+
+    // Validate name
+    if (!formData.name.trim()) {
+      toast.error('Por favor, insira seu nome');
+      return;
+    }
     
     setIsSubmitting(true);
     
     try {
-      // Register user with Supabase auth
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name
-          }
-        }
+      console.log("Starting registration process");
+      // Register user with our signUp function
+      const { error, data } = await signUp(formData.email, formData.password, {
+        name: formData.name
       });
       
       if (error) throw error;
+      
+      console.log("User registered successfully:", data);
       
       // Create profile entry in profiles table
       const { error: profileError } = await supabase
@@ -68,11 +85,15 @@ const UserRegistration = () => {
           user_type: 'customer' // Default to customer
         });
       
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        throw profileError;
+      }
       
-      toast.success('Usuário registrado com sucesso!');
-      navigate('/');
+      toast.success('Usuário registrado com sucesso! Faça login para continuar.');
+      navigate('/login');
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast.error(`Erro ao registrar usuário: ${error.message}`);
     } finally {
       setIsSubmitting(false);

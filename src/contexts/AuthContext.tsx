@@ -11,6 +11,7 @@ type AuthContextType = {
   isLoading: boolean;
   isAdmin: boolean;
   signIn: (identifier: string, password: string, rememberMe: boolean) => Promise<void>;
+  signUp: (email: string, password: string, userData: any) => Promise<{ error: any | null; data: any | null }>;
   signOut: () => Promise<void>;
 };
 
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        console.log("Auth state change:", event, newSession?.user?.email);
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
@@ -39,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           localStorage.removeItem('isLoggedIn');
           localStorage.removeItem('username');
           localStorage.removeItem('userType');
-        } else if (event === 'SIGNED_IN' && newSession) {
+        } else if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && newSession) {
           // Set basic localStorage values
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('username', 
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .from('profiles')
                 .select('*')
                 .eq('id', newSession.user.id)
-                .single();
+                .maybeSingle();
               
               setProfile(data);
               
@@ -76,7 +78,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // THEN check for existing session
     const initializeAuth = async () => {
       try {
+        console.log("Initializing auth, getting session...");
         const { data: { session: initialSession } } = await supabase.auth.getSession();
+        console.log("Initial session:", initialSession?.user?.email);
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
         
@@ -85,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             .from('profiles')
             .select('*')
             .eq('id', initialSession.user.id)
-            .single();
+            .maybeSingle();
             
           setProfile(data);
           setIsAdmin(
@@ -110,6 +114,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Sign in function
   const signIn = async (identifier: string, password: string, rememberMe: boolean) => {
     try {
+      console.log("Starting sign in process for:", identifier);
       // Special case for admin user
       if (identifier === 'admin' && password === 'admin123') {
         const adminEmail = 'admin@example.com';
@@ -131,22 +136,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (isEmail) {
         // Login with email
+        console.log("Logging in with email");
         authResponse = await supabase.auth.signInWithPassword({
           email: identifier,
           password
         });
       } else {
         // For username login, find the email associated with username
+        console.log("Looking up email for username:", identifier);
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('email')
           .eq('name', identifier)
-          .single();
+          .maybeSingle();
           
-        if (profileError || !profileData?.email) {
+        if (profileError) {
+          console.error("Profile lookup error:", profileError);
           throw new Error('Usuário não encontrado');
         }
         
+        if (!profileData?.email) {
+          throw new Error('Email not found for username');
+        }
+        
+        console.log("Found email for username:", profileData.email);
         // Login with the retrieved email
         authResponse = await supabase.auth.signInWithPassword({
           email: profileData.email,
@@ -154,16 +167,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
       }
       
-      const { error } = authResponse;
-      if (error) throw error;
+      const { error, data } = authResponse;
+      if (error) {
+        console.error("Auth error:", error);
+        throw error;
+      }
       
+      console.log("Login successful, user:", data.user?.email);
       // Set session persistence based on rememberMe
       localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
       
       toast.success('Login realizado com sucesso!');
     } catch (error: any) {
+      console.error("Login error:", error);
       toast.error(error.message || 'Credenciais inválidas');
       throw error;
+    }
+  };
+
+  // Sign up function
+  const signUp = async (email: string, password: string, userData: any) => {
+    try {
+      console.log("Starting signup process for:", email);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData
+        }
+      });
+      
+      if (error) {
+        console.error("Signup error:", error);
+        throw error;
+      }
+      
+      return { data, error: null };
+    } catch (error: any) {
+      console.error("Error in signUp function:", error);
+      toast.error(error.message || 'Erro ao registrar usuário');
+      return { data: null, error };
     }
   };
 
@@ -185,6 +228,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isLoading,
     isAdmin,
     signIn,
+    signUp,
     signOut
   };
 

@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 import LoginForm from '@/components/login/LoginForm';
 import LoggedInState from '@/components/login/LoggedInState';
+import { toast } from 'sonner';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -38,12 +39,25 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    if (!identifier.trim()) {
+      toast.error('Por favor, insira seu email ou nome de usuário');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!password) {
+      toast.error('Por favor, insira sua senha');
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
-      await signOut(); // First logout to clear any existing session
+      const { signIn } = useAuth();
       await signIn(identifier, password, rememberMe);
       navigate('/movies');
     } catch (error) {
       console.error('Login error:', error);
+      // Toast is already shown in signIn function
     } finally {
       setIsSubmitting(false);
     }

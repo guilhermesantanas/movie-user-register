@@ -9,23 +9,28 @@ import { toast } from 'sonner';
  */
 const useSessionPersistence = () => {
   const navigate = useNavigate();
-  const { session, user } = useAuth();
+  const { session, user, signOut } = useAuth();
   
   useEffect(() => {
     // Check session persistence based on rememberMe
     const checkSessionExpiration = () => {
       try {
+        // If there's no session, don't need to check further
+        if (!session) return;
+        
         const rememberMe = localStorage.getItem('rememberMe') === 'true';
         
         // If there's a session but "Remember Me" is false, enforce shorter session
-        if (session && !rememberMe) {
+        if (!rememberMe) {
           const lastActivity = localStorage.getItem('lastActivityTime');
           const now = new Date().getTime();
           
           // If last activity was more than 30 minutes ago, log user out
           if (lastActivity && now - parseInt(lastActivity) > 30 * 60 * 1000) {
+            console.log("Session expired due to inactivity");
             toast('Your session has expired. Please log in again.');
-            navigate('/login');
+            signOut().then(() => navigate('/login'));
+            return;
           }
         }
         
@@ -65,7 +70,7 @@ const useSessionPersistence = () => {
       window.removeEventListener('scroll', updateActivity);
       window.removeEventListener('mousemove', updateActivity);
     };
-  }, [navigate, session, user]);
+  }, [navigate, session, user, signOut]);
 };
 
 export default useSessionPersistence;

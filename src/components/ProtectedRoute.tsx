@@ -1,7 +1,7 @@
 
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -14,6 +14,14 @@ const ProtectedRoute = ({
   redirectPath = '/login' 
 }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Only show toast when redirecting from a non-login page
+    if (!isLoading && !user && location.pathname !== '/login') {
+      toast.error('Você precisa estar logado para acessar esta página');
+    }
+  }, [user, isLoading, location.pathname]);
   
   // Show loading while checking auth status
   if (isLoading) {
@@ -25,8 +33,7 @@ const ProtectedRoute = ({
   }
 
   if (!user) {
-    toast.error('Você precisa estar logado para acessar esta página');
-    return <Navigate to={redirectPath} replace />;
+    return <Navigate to={redirectPath} replace state={{ from: location }} />;
   }
 
   return <>{children}</>;
