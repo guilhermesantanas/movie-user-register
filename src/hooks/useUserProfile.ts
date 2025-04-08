@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfileData } from '@/types/profile';
+import { useAuth } from '@/contexts/AuthContext';
 
 const useUserProfile = () => {
   const navigate = useNavigate();
+  const { user, profile: authProfile } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profile, setProfile] = useState<UserProfileData | null>(null);
 
@@ -15,44 +17,48 @@ const useUserProfile = () => {
     const fetchProfile = async () => {
       try {
         // Check if user is authenticated
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
+        if (!user) {
           toast.error('Você precisa estar logado para acessar esta página');
           navigate('/login');
           return;
         }
 
-        // Get current user data
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          throw new Error("Usuário não encontrado");
+        // Use profile from auth context if available
+        if (authProfile) {
+          setProfile({
+            id: user.id,
+            name: authProfile.name || user.user_metadata?.name || '',
+            email: user.email || '',
+            phone: authProfile.phone || '',
+            city: authProfile.city || '',
+            country: authProfile.country || '',
+            birth_date: authProfile.birth_date || '',
+            user_type: authProfile.user_type || localStorage.getItem('userType') || 'customer'
+          });
+        } else {
+          // Try to get user profile from profiles table if not in auth context
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+            console.error('Error fetching profile:', error);
+          }
+          
+          // Use profile data from DB or create a new profile object from auth user
+          setProfile({
+            id: user.id,
+            name: profileData?.name || user.user_metadata?.name || '',
+            email: user.email || '',
+            phone: profileData?.phone || '',
+            city: profileData?.city || '',
+            country: profileData?.country || '',
+            birth_date: profileData?.birth_date || '',
+            user_type: profileData?.user_type || localStorage.getItem('userType') || 'customer'
+          });
         }
-        
-        // Try to get user profile from profiles table
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
-          console.error('Error fetching profile:', error);
-        }
-        
-        // Use profile data from DB or create a new profile object from auth user
-        setProfile({
-          id: user.id,
-          name: profileData?.name || user.user_metadata?.name || '',
-          email: user.email || '',
-          phone: profileData?.phone || '',
-          city: profileData?.city || '',
-          country: profileData?.country || '',
-          birth_date: profileData?.birth_date || '',
-          user_type: profileData?.user_type || localStorage.getItem('userType') || 'customer'
-        });
-        
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
         toast.error('Falha ao carregar informações do perfil');
@@ -62,7 +68,7 @@ const useUserProfile = () => {
     };
 
     fetchProfile();
-  }, [navigate]);
+  }, [navigate, user, authProfile]);
 
   return { profile, setProfile, isLoading };
 };

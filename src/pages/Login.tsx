@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -7,42 +7,55 @@ import { ArrowLeft } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 import LoginForm from '@/components/login/LoginForm';
 import LoggedInState from '@/components/login/LoggedInState';
-import { useAuth } from '@/hooks/useAuth';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoading, profile, signOut } = useAuth();
+  
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [username, setUsername] = useState('');
-  
-  const { 
-    identifier, 
-    setIdentifier, 
-    password, 
-    setPassword, 
-    rememberMe, 
-    setRememberMe, 
-    isSubmitting, 
-    handleLogin, 
-    handleLogout 
-  } = useAuth();
-  
-  // Check if user is already logged in
+
+  // Set username from profile when available
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setIsLoggedIn(true);
-        const { data: { user: userData } } = await supabase.auth.getUser();
-        setUsername(userData?.user_metadata?.name || userData?.email || 'Usuário');
-      }
-    };
+    if (user) {
+      setUsername(
+        profile?.name || 
+        user.user_metadata?.name || 
+        user.email || 
+        'Usuário'
+      );
+    }
+  }, [user, profile]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
     
-    checkSession();
-  }, []);
+    try {
+      await signOut(); // First logout to clear any existing session
+      await signIn(identifier, password, rememberMe);
+      navigate('/movies');
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const { signIn } = useAuth();
+  
+  const handleProfileClick = () => navigate('/profile');
+  const handleLogoutClick = async () => {
+    await signOut();
+    navigate('/login');
+  };
   
   return (
     <PageTransition>
@@ -68,11 +81,15 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            {isLoggedIn ? (
+            {isLoading ? (
+              <div className="flex justify-center py-6">
+                <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+              </div>
+            ) : user ? (
               <LoggedInState 
                 username={username}
-                onProfileClick={() => navigate('/profile')}
-                onLogout={handleLogout}
+                onProfileClick={handleProfileClick}
+                onLogout={handleLogoutClick}
               />
             ) : (
               <LoginForm

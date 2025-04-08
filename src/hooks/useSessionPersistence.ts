@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 /**
@@ -9,26 +9,12 @@ import { toast } from 'sonner';
  */
 const useSessionPersistence = () => {
   const navigate = useNavigate();
+  const { session, user } = useAuth();
   
   useEffect(() => {
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT') {
-          // Clear any local storage items when user signs out
-          localStorage.removeItem('rememberMe');
-          localStorage.removeItem('lastActivityTime');
-          localStorage.removeItem('isLoggedIn');
-          localStorage.removeItem('username');
-          localStorage.removeItem('userType');
-        }
-      }
-    );
-    
     // Check session persistence based on rememberMe
-    const checkSessionExpiration = async () => {
+    const checkSessionExpiration = () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
         const rememberMe = localStorage.getItem('rememberMe') === 'true';
         
         // If there's a session but "Remember Me" is false, enforce shorter session
@@ -38,7 +24,6 @@ const useSessionPersistence = () => {
           
           // If last activity was more than 30 minutes ago, log user out
           if (lastActivity && now - parseInt(lastActivity) > 30 * 60 * 1000) {
-            await supabase.auth.signOut();
             toast('Your session has expired. Please log in again.');
             navigate('/login');
           }
@@ -61,7 +46,7 @@ const useSessionPersistence = () => {
     
     // Track user activity with a single function to avoid duplication
     const updateActivity = () => {
-      if (localStorage.getItem('isLoggedIn') === 'true') {
+      if (user) {
         localStorage.setItem('lastActivityTime', new Date().getTime().toString());
       }
     };
@@ -74,14 +59,13 @@ const useSessionPersistence = () => {
     
     return () => {
       // Clean up subscriptions and event listeners
-      subscription.unsubscribe();
       clearInterval(activityInterval);
       window.removeEventListener('click', updateActivity);
       window.removeEventListener('keypress', updateActivity);
       window.removeEventListener('scroll', updateActivity);
       window.removeEventListener('mousemove', updateActivity);
     };
-  }, [navigate]);
+  }, [navigate, session, user]);
 };
 
 export default useSessionPersistence;
