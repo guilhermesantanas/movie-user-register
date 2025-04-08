@@ -17,7 +17,7 @@ import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useSessionPersistence from "./hooks/useSessionPersistence";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/auth";
 
 // Create a client
 const queryClient = new QueryClient();

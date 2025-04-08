@@ -2,7 +2,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import React, { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

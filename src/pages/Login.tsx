@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
 import Button from '@/components/Button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 
 import LoginForm from '@/components/login/LoginForm';
 import LoggedInState from '@/components/login/LoggedInState';
@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { user, isLoading, profile, signOut } = useAuth();
+  const { user, isLoading, profile, signOut, signIn } = useAuth();
   
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +52,6 @@ const Login = () => {
     }
     
     try {
-      const { signIn } = useAuth();
       await signIn(identifier, password, rememberMe);
       navigate('/movies');
     } catch (error) {
@@ -62,8 +61,6 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-
-  const { signIn } = useAuth();
   
   const handleProfileClick = () => navigate('/profile');
   const handleLogoutClick = async () => {
