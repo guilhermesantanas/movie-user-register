@@ -138,16 +138,20 @@ export const useAuthActions = () => {
   const signIn = async (identifier: string, password: string, rememberMe: boolean) => {
     try {
       console.log("Starting sign in process for:", identifier);
-      // Special case for admin user
+      
+      // Handle admin login specifically - updated to use proper email format
       if (identifier === 'admin' && password === 'admin123') {
-        const adminEmail = 'admin@example.com';
-        
-        const { error } = await supabase.auth.signInWithPassword({
-          email: adminEmail,
-          password
+        // Using the admin email directly as it's expected by Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: 'admin@example.com',
+          password: 'admin123'  // Using the same password for simplicity
         });
         
         if (error) throw error;
+        
+        // Create profile for admin if it doesn't exist
+        await ensureAdminProfile(data.user);
+        
         toast.success('Login administrativo realizado com sucesso!');
         return;
       }
@@ -205,6 +209,37 @@ export const useAuthActions = () => {
       console.error("Login error:", error);
       toast.error(error.message || 'Credenciais inválidas');
       throw error;
+    }
+  };
+
+  // Helper function to ensure admin profile exists
+  const ensureAdminProfile = async (user: User) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+        
+      if (!data) {
+        // Create admin profile if it doesn't exist
+        await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            name: 'Admin',
+            email: user.email,
+            user_type: 'admin'
+          });
+      } else if (data.user_type !== 'admin') {
+        // Update user_type to admin if it's not already
+        await supabase
+          .from('profiles')
+          .update({ user_type: 'admin' })
+          .eq('id', user.id);
+      }
+    } catch (error) {
+      console.error("Error ensuring admin profile:", error);
     }
   };
 
