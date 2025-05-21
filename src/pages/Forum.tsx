@@ -104,7 +104,7 @@ const Forum = () => {
       <div className="grid gap-4">
         {sortedTopics.length > 0 ? (
           sortedTopics.map((topic) => (
-            <TopicCard key={topic.id} topic={topic} />
+            <TopicCard key={topic.id} topic={topic} formatDate={formatDate} />
           ))
         ) : (
           <Card className="py-12">
@@ -122,7 +122,8 @@ const Forum = () => {
   );
 };
 
-const TopicCard = ({ topic }) => {
+// Update the component to accept the formatDate function as a prop
+const TopicCard = ({ topic, formatDate }) => {
   return (
     <Card className="transition-all hover:border-primary/20 hover:shadow-md">
       <CardHeader className="pb-2">
