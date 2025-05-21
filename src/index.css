@@ -35,7 +35,7 @@
     --input: 240 5% 25%;
     --ring: 240 5% 65%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 240 10% 8%;
     --sidebar-foreground: 240 5% 75%;
@@ -45,36 +45,6 @@
     --sidebar-accent-foreground: 240 5% 75%;
     --sidebar-border: 240 5% 20%;
     --sidebar-ring: 240 5% 65%;
-  }
-
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 100% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 217 33% 18%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217 33% 18%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 217 33% 18%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 213 27% 84%;
   }
 }
 
@@ -86,12 +56,13 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', sans-serif;
   }
   
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
@@ -112,14 +83,14 @@
   .input-field {
     @apply transition-all duration-300 ease-in-out;
     @apply bg-secondary bg-opacity-80 backdrop-blur-md;
-    @apply border border-border rounded-xl px-4 py-3;
+    @apply border border-border rounded-md px-4 py-3;
     @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30;
     @apply placeholder:text-muted-foreground;
     @apply w-full;
   }
   
   .btn-primary {
-    @apply bg-primary text-primary-foreground rounded-xl px-6 py-3;
+    @apply bg-primary text-primary-foreground rounded-md px-6 py-3;
     @apply transition-all duration-300 ease-in-out;
     @apply hover:brightness-105 active:brightness-95;
     @apply focus:outline-none focus:ring-2 focus:ring-primary/20;
@@ -129,7 +100,7 @@
   
   .card {
     @apply bg-card bg-opacity-80 backdrop-blur-md;
-    @apply border border-border rounded-2xl;
+    @apply border border-border rounded-md;
     @apply shadow-sm;
     @apply transition-all duration-300 ease-in-out;
   }

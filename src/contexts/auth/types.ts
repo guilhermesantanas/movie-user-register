@@ -1,6 +1,8 @@
 
 import { Session, User } from '@supabase/supabase-js';
 
+export type UserType = 'user' | 'moderator' | 'admin';
+
 export type Profile = {
   id: string;
   name?: string;
@@ -9,7 +11,7 @@ export type Profile = {
   city?: string;
   country?: string;
   birth_date?: string;
-  user_type?: string;
+  user_type?: UserType;
 };
 
 export type AuthContextType = {
@@ -18,6 +20,7 @@ export type AuthContextType = {
   profile: Profile | null;
   isLoading: boolean;
   isAdmin: boolean;
+  isModerator: boolean;
   signIn: (identifier: string, password: string, rememberMe: boolean) => Promise<void>;
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any | null; data: any | null }>;
   signOut: () => Promise<void>;
