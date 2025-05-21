@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Profile } from './types';
+import { Profile, UserType } from './types';
 
 export const useAuthState = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -11,6 +11,7 @@ export const useAuthState = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
 
   // Initialize auth state
   useEffect(() => {
@@ -24,6 +25,7 @@ export const useAuthState = () => {
         if (event === 'SIGNED_OUT') {
           setProfile(null);
           setIsAdmin(false);
+          setIsModerator(false);
           localStorage.removeItem('rememberMe');
           localStorage.removeItem('lastActivityTime');
           localStorage.removeItem('isLoggedIn');
@@ -46,14 +48,23 @@ export const useAuthState = () => {
                 .eq('id', newSession.user.id)
                 .maybeSingle();
               
-              setProfile(data);
-              
-              if (data?.user_type === 'admin' || 
-                  newSession.user.email === 'admin@example.com') {
-                setIsAdmin(true);
-                localStorage.setItem('userType', 'admin');
-              } else {
-                localStorage.setItem('userType', data?.user_type || 'customer');
+              if (data) {
+                const userType = data.user_type as UserType || 'user';
+                
+                setProfile({
+                  id: data.id,
+                  name: data.name,
+                  email: data.email,
+                  phone: data.phone,
+                  city: data.city,
+                  country: data.country,
+                  birth_date: data.birth_date,
+                  user_type: userType
+                });
+                
+                setIsAdmin(userType === 'admin' || newSession.user.email === 'admin@example.com');
+                setIsModerator(userType === 'moderator' || userType === 'admin');
+                localStorage.setItem('userType', userType);
               }
             } catch (error) {
               console.error('Error fetching user profile:', error);
@@ -79,11 +90,24 @@ export const useAuthState = () => {
             .eq('id', initialSession.user.id)
             .maybeSingle();
             
-          setProfile(data);
-          setIsAdmin(
-            data?.user_type === 'admin' || 
-            initialSession.user.email === 'admin@example.com'
-          );
+          if (data) {
+            const userType = data.user_type as UserType || 'user';
+            
+            setProfile({
+              id: data.id,
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              city: data.city,
+              country: data.country,
+              birth_date: data.birth_date,
+              user_type: userType
+            });
+            
+            setIsAdmin(userType === 'admin' || initialSession.user.email === 'admin@example.com');
+            setIsModerator(userType === 'moderator' || userType === 'admin');
+            localStorage.setItem('userType', userType);
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -104,7 +128,8 @@ export const useAuthState = () => {
     user,
     profile,
     isLoading,
-    isAdmin
+    isAdmin,
+    isModerator
   };
 };
 
