@@ -59,7 +59,8 @@ export const useAuthState = () => {
                   city: data.city,
                   country: data.country,
                   birth_date: data.birth_date,
-                  user_type: userType
+                  user_type: userType,
+                  avatar_url: data.avatar_url
                 });
                 
                 setIsAdmin(userType === 'admin' || newSession.user.email === 'admin@example.com');
@@ -101,7 +102,8 @@ export const useAuthState = () => {
               city: data.city,
               country: data.country,
               birth_date: data.birth_date,
-              user_type: userType
+              user_type: userType,
+              avatar_url: data.avatar_url
             });
             
             setIsAdmin(userType === 'admin' || initialSession.user.email === 'admin@example.com');

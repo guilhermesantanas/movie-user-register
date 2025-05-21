@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, MessageSquare, Shield } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from 'sonner';
 
@@ -15,6 +16,7 @@ interface Comment {
   user_name: string;
   content: string;
   created_at: string;
+  avatar_url?: string | null;
 }
 
 interface MovieCommentsProps {
@@ -30,6 +32,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState('');
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
   // Setup user information from Supabase
   useEffect(() => {
@@ -46,6 +49,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
           
           setUser(session.user);
           setUserName(profileData?.name || session.user.email || 'Usuário');
+          setUserAvatar(profileData?.avatar_url || null);
           setIsAdmin(profileData?.user_type === 'admin');
         }
       } catch (error) {
@@ -63,15 +67,35 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     const fetchComments = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        // First, fetch all comments for the movie
+        const { data: commentsData, error: commentsError } = await supabase
           .from('movie_comments')
           .select('*')
           .eq('movie_id', movieId)
           .order('created_at', { ascending: false });
           
-        if (error) throw error;
+        if (commentsError) throw commentsError;
         
-        setComments(data || []);
+        // Then, for each comment with a user_id, fetch the profile to get the avatar_url
+        const commentsWithAvatars = await Promise.all(
+          (commentsData || []).map(async (comment) => {
+            if (comment.user_id) {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('avatar_url')
+                .eq('id', comment.user_id)
+                .maybeSingle();
+                
+              return {
+                ...comment,
+                avatar_url: profileData?.avatar_url || null
+              };
+            }
+            return comment;
+          })
+        );
+        
+        setComments(commentsWithAvatars || []);
       } catch (error) {
         uiToast({
           title: "Erro",
@@ -244,7 +268,10 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
-                  <Avatar className={getAvatarColor(comment.user_name)}>
+                  <Avatar className={comment.avatar_url ? '' : getAvatarColor(comment.user_name)}>
+                    {comment.avatar_url ? (
+                      <AvatarImage src={comment.avatar_url} alt={comment.user_name} />
+                    ) : null}
                     <AvatarFallback>{getInitials(comment.user_name)}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">

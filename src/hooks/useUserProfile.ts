@@ -33,7 +33,8 @@ const useUserProfile = () => {
             city: authProfile.city || '',
             country: authProfile.country || '',
             birth_date: authProfile.birth_date || '',
-            user_type: authProfile.user_type || localStorage.getItem('userType') || 'customer'
+            user_type: authProfile.user_type || localStorage.getItem('userType') || 'customer',
+            avatar_url: authProfile.avatar_url || ''
           });
         } else {
           // Try to get user profile from profiles table if not in auth context
@@ -56,7 +57,8 @@ const useUserProfile = () => {
             city: profileData?.city || '',
             country: profileData?.country || '',
             birth_date: profileData?.birth_date || '',
-            user_type: profileData?.user_type || localStorage.getItem('userType') || 'customer'
+            user_type: profileData?.user_type || localStorage.getItem('userType') || 'customer',
+            avatar_url: profileData?.avatar_url || ''
           });
         }
       } catch (error) {

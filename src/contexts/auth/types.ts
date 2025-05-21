@@ -12,6 +12,7 @@ export type Profile = {
   country?: string;
   birth_date?: string;
   user_type?: UserType;
+  avatar_url?: string;
 };
 
 export type AuthContextType = {

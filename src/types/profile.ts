@@ -8,4 +8,5 @@ export interface UserProfileData {
   country: string | null;
   birth_date: string | null;
   user_type: string | null;
+  avatar_url: string | null;
 }

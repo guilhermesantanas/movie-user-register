@@ -7,8 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-const ForumTopics = [
+// Add avatar_url field to the ForumTopic interface
+interface ForumTopic {
+  id: number;
+  title: string;
+  author: string;
+  authorType: 'user' | 'moderator' | 'admin';
+  replies: number;
+  lastActivity: string;
+  isPinned: boolean;
+  avatar_url?: string;
+}
+
+const ForumTopics: ForumTopic[] = [
   {
     id: 1,
     title: 'Discussão sobre os novos lançamentos de 2024',
@@ -16,7 +29,8 @@ const ForumTopics = [
     authorType: 'user',
     replies: 24,
     lastActivity: '2024-05-15T14:30:00',
-    isPinned: true
+    isPinned: true,
+    avatar_url: 'https://i.pravatar.cc/150?u=maria'
   },
   {
     id: 2,
@@ -25,7 +39,8 @@ const ForumTopics = [
     authorType: 'moderator',
     replies: 16,
     lastActivity: '2024-05-16T09:45:00',
-    isPinned: false
+    isPinned: false,
+    avatar_url: 'https://i.pravatar.cc/150?u=joao'
   },
   {
     id: 3,
@@ -34,7 +49,8 @@ const ForumTopics = [
     authorType: 'admin',
     replies: 32,
     lastActivity: '2024-05-17T18:20:00',
-    isPinned: false
+    isPinned: false,
+    avatar_url: 'https://i.pravatar.cc/150?u=carlos'
   },
   {
     id: 4,
@@ -43,7 +59,8 @@ const ForumTopics = [
     authorType: 'user',
     replies: 47,
     lastActivity: '2024-05-18T11:10:00',
-    isPinned: false
+    isPinned: false,
+    avatar_url: 'https://i.pravatar.cc/150?u=ana'
   }
 ];
 
@@ -122,8 +139,35 @@ const Forum = () => {
   );
 };
 
-// Update the component to accept the formatDate function as a prop
-const TopicCard = ({ topic, formatDate }) => {
+interface TopicCardProps {
+  topic: ForumTopic;
+  formatDate: (dateString: string) => string;
+}
+
+const TopicCard = ({ topic, formatDate }: TopicCardProps) => {
+  const getInitials = (name: string) => {
+    return name.substring(0, 2).toUpperCase();
+  };
+  
+  const getAvatarColor = (name: string, type: 'user' | 'moderator' | 'admin') => {
+    if (type === 'admin') return 'bg-red-500';
+    if (type === 'moderator') return 'bg-purple-500';
+    
+    const colors = [
+      'bg-blue-500', 'bg-green-500', 
+      'bg-yellow-500', 'bg-indigo-500',
+      'bg-pink-500', 'bg-teal-500'
+    ];
+    
+    // Simple hash function to determine color
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   return (
     <Card className="transition-all hover:border-primary/20 hover:shadow-md">
       <CardHeader className="pb-2">
@@ -146,6 +190,12 @@ const TopicCard = ({ topic, formatDate }) => {
       <CardContent>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
+            <Avatar className={topic.avatar_url ? '' : getAvatarColor(topic.author, topic.authorType)}>
+              {topic.avatar_url ? (
+                <AvatarImage src={topic.avatar_url} alt={topic.author} />
+              ) : null}
+              <AvatarFallback>{getInitials(topic.author)}</AvatarFallback>
+            </Avatar>
             <div className="flex items-center">
               {topic.authorType === 'admin' ? (
                 <Badge variant="default" className="flex items-center gap-1">
