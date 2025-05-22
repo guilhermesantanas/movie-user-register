@@ -13,5 +13,5 @@ export interface Movie {
   language?: string;
   rating?: string;
   trailer_url?: string;
-  created_at?: string;
+  created_at: string; // Changed from optional to required
 }

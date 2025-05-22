@@ -150,7 +150,18 @@ export const useMoviesData = () => {
           }
         }
         
-        setMovies(moviesData);
+        // Ensure all movies have a created_at field
+        const validMoviesData = moviesData.map(movie => {
+          if (!movie.created_at) {
+            return {
+              ...movie,
+              created_at: new Date().toISOString()
+            };
+          }
+          return movie;
+        });
+        
+        setMovies(validMoviesData);
         
       } catch (error: any) {
         console.error('Erro ao buscar filmes:', error);
