@@ -13,7 +13,7 @@ const Index = () => {
         <div className="w-full max-w-md">
           <AppHeader 
             title="Gerenciamento de Cinema" 
-            subtitle="Cadastre usuários e filmes com facilidade"
+            subtitle="Explore nossa coleção de filmes com facilidade"
           />
           
           <motion.div 
