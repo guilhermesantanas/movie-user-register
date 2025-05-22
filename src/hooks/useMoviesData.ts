@@ -35,7 +35,7 @@ export const useMoviesData = () => {
         // If Tropa de Elite doesn't exist and there are no movies, add it
         if (!tropaDaEliteExists) {
           const currentDate = new Date().toISOString();
-          const tropaDeElite: Movie = {
+          const tropaDeElite = {
             id: 'tropa-de-elite',
             title: 'Tropa de Elite',
             release_date: '2007-10-12',
@@ -48,6 +48,7 @@ export const useMoviesData = () => {
             imdb_rating: 8.1,
             language: 'Português',
             rating: '18+',
+            trailer_url: '',
             created_at: currentDate,
           };
           
@@ -68,7 +69,7 @@ export const useMoviesData = () => {
 
         // Add more example movies if there are fewer than 6 movies
         if (moviesData.length < 6) {
-          const additionalMovies: Movie[] = [
+          const additionalMovies = [
             {
               id: 'cidade-de-deus',
               title: 'Cidade de Deus',
@@ -82,6 +83,7 @@ export const useMoviesData = () => {
               imdb_rating: 8.6,
               language: 'Português',
               rating: '18+',
+              trailer_url: '',
               created_at: new Date('2024-01-15').toISOString(),
             },
             {
@@ -97,6 +99,7 @@ export const useMoviesData = () => {
               imdb_rating: 8.0,
               language: 'Português',
               rating: '12+',
+              trailer_url: '',
               created_at: new Date('2024-02-10').toISOString(),
             },
             {
@@ -112,6 +115,7 @@ export const useMoviesData = () => {
               imdb_rating: 8.6,
               language: 'Português',
               rating: 'Livre',
+              trailer_url: '',
               created_at: new Date('2024-03-05').toISOString(),
             },
             {
@@ -127,6 +131,7 @@ export const useMoviesData = () => {
               imdb_rating: 7.5,
               language: 'Português',
               rating: '16+',
+              trailer_url: '',
               created_at: new Date('2024-04-12').toISOString(),
             }
           ];
@@ -150,18 +155,21 @@ export const useMoviesData = () => {
           }
         }
         
-        // Ensure all movies have a created_at field
+        // Ensure all movies have required fields
         const validMoviesData = moviesData.map(movie => {
-          if (!movie.created_at) {
-            return {
-              ...movie,
-              created_at: new Date().toISOString()
-            };
-          }
-          return movie;
+          return {
+            ...movie,
+            created_at: movie.created_at || new Date().toISOString(),
+            poster_url: movie.poster_url || '',
+            registered_by: movie.registered_by || 'Unknown',
+            imdb_rating: movie.imdb_rating || 0,
+            language: movie.language || 'Unknown',
+            rating: movie.rating || 'Unknown',
+            trailer_url: movie.trailer_url || ''
+          };
         });
         
-        setMovies(validMoviesData);
+        setMovies(validMoviesData as Movie[]);
         
       } catch (error: any) {
         console.error('Erro ao buscar filmes:', error);

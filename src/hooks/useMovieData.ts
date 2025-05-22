@@ -29,7 +29,18 @@ export const useMovieData = (movieId: string | undefined) => {
         if (error) throw error;
         
         if (data) {
-          setMovie(data as Movie);
+          // Ensure the movie data has all required fields
+          const movieData = {
+            ...data,
+            poster_url: data.poster_url || '',
+            registered_by: data.registered_by || 'Unknown',
+            imdb_rating: data.imdb_rating || 0,
+            language: data.language || 'Unknown',
+            rating: data.rating || 'Unknown',
+            trailer_url: data.trailer_url || '',
+            created_at: data.created_at || new Date().toISOString()
+          };
+          setMovie(movieData as Movie);
         } else {
           setError('Movie not found');
         }
