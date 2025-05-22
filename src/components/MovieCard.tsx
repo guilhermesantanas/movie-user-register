@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Film, X } from 'lucide-react';
+import { useAuth } from '@/contexts/auth';
 import { 
   HoverCard,
   HoverCardContent,
@@ -39,6 +40,8 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
+  const { profile } = useAuth();
+  const isAdmin = profile?.user_type === 'admin';
   
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,13 +49,15 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
     
     if (isDeleting) return;
     
-    try {
-      setIsDeleting(true);
-      await onDelete(movie.id);
-    } catch (error) {
-      console.error('Erro ao excluir filme:', error);
-    } finally {
-      setIsDeleting(false);
+    if (window.confirm(`Tem certeza que deseja excluir o filme "${movie.title}"?`)) {
+      try {
+        setIsDeleting(true);
+        await onDelete(movie.id);
+      } catch (error) {
+        console.error('Erro ao excluir filme:', error);
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
   
@@ -72,7 +77,7 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
       onClick={handleCardClick}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
-      {isHovered && (
+      {isHovered && isAdmin && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

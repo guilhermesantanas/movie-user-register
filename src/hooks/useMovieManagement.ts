@@ -34,6 +34,7 @@ export const useMovieManagement = (movies: Movie[], setMovies: React.Dispatch<Re
       toast.success('Filme excluído com sucesso');
     } catch (error: any) {
       toast.error('Falha ao excluir filme. Por favor, tente novamente.');
+      console.error("Deletion error:", error);
     } finally {
       setIsDeleting(false);
     }

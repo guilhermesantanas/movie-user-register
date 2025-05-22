@@ -9,81 +9,207 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { ForumTopic, ForumCategory, OnlineUser, RecentPost } from '@/types/forum';
+import ForumCategoryComponent from '@/components/forum/ForumCategory';
+import OnlineUsers from '@/components/forum/OnlineUsers';
+import RecentPosts from '@/components/forum/RecentPosts';
 
-// Add avatar_url field to the ForumTopic interface
-interface ForumTopic {
-  id: number;
-  title: string;
-  author: string;
-  authorType: 'user' | 'moderator' | 'admin';
-  replies: number;
-  lastActivity: string;
-  isPinned: boolean;
-  isRules?: boolean;
-  avatar_url?: string;
-}
-
-const ForumTopics: ForumTopic[] = [
+// Forum categories and topics data
+const forumCategories: ForumCategory[] = [
   {
-    id: 0,
-    title: 'Regras do Fórum - Leia antes de postar',
-    author: 'Administrador',
-    authorType: 'admin',
-    replies: 0,
-    lastActivity: '2024-05-01T10:00:00',
-    isPinned: true,
-    isRules: true,
-    avatar_url: 'https://i.pravatar.cc/150?u=admin'
+    id: 'rules',
+    name: 'Regras e Anúncios',
+    description: 'Informações importantes sobre o funcionamento do fórum',
+    topics: [
+      {
+        id: 0,
+        title: 'Regras do Fórum - Leia antes de postar',
+        author: 'Administrador',
+        authorType: 'admin',
+        replies: 0,
+        lastActivity: '2024-05-01T10:00:00',
+        isPinned: true,
+        isRules: true,
+        avatar_url: 'https://i.pravatar.cc/150?u=admin',
+        category: 'rules'
+      },
+      {
+        id: 5,
+        title: 'Atualizações da plataforma - Maio 2024',
+        author: 'Administrador',
+        authorType: 'admin',
+        replies: 3,
+        lastActivity: '2024-05-20T16:45:00',
+        isPinned: true,
+        avatar_url: 'https://i.pravatar.cc/150?u=admin',
+        category: 'rules'
+      }
+    ]
   },
   {
-    id: 5,
-    title: 'Atualizações da plataforma - Maio 2024',
-    author: 'Administrador',
-    authorType: 'admin',
-    replies: 3,
-    lastActivity: '2024-05-20T16:45:00',
-    isPinned: true,
-    avatar_url: 'https://i.pravatar.cc/150?u=admin'
+    id: 'directors',
+    name: 'Diretores',
+    description: 'Discussões sobre diretores de cinema e seus trabalhos',
+    topics: [
+      {
+        id: 6,
+        title: 'Martin Scorsese - Retrospectiva',
+        author: 'Lucas Mendes',
+        authorType: 'moderator',
+        replies: 42,
+        lastActivity: '2024-05-21T14:30:00',
+        isPinned: true,
+        avatar_url: 'https://i.pravatar.cc/150?u=lucas',
+        category: 'directors'
+      },
+      {
+        id: 7,
+        title: 'Diretores brasileiros contemporâneos',
+        author: 'Ana Souza',
+        authorType: 'user',
+        replies: 18,
+        lastActivity: '2024-05-19T09:45:00',
+        isPinned: false,
+        avatar_url: 'https://i.pravatar.cc/150?u=ana',
+        category: 'directors'
+      },
+      {
+        id: 8,
+        title: 'Christopher Nolan - Técnicas de filmagem',
+        author: 'Paulo Ramos',
+        authorType: 'user',
+        replies: 24,
+        lastActivity: '2024-05-18T11:20:00',
+        isPinned: false,
+        avatar_url: 'https://i.pravatar.cc/150?u=paulo',
+        category: 'directors'
+      }
+    ]
   },
   {
-    id: 1,
-    title: 'Discussão sobre os novos lançamentos de 2024',
-    author: 'Maria Silva',
-    authorType: 'user',
-    replies: 24,
-    lastActivity: '2024-05-15T14:30:00',
-    isPinned: true,
-    avatar_url: 'https://i.pravatar.cc/150?u=maria'
+    id: 'actors',
+    name: 'Atores e Atrizes',
+    description: 'Discussões sobre atuações e carreiras de artistas',
+    topics: [
+      {
+        id: 9,
+        title: 'Melhores atuações de 2023',
+        author: 'Fernanda Lima',
+        authorType: 'moderator',
+        replies: 31,
+        lastActivity: '2024-05-20T16:15:00',
+        isPinned: true,
+        avatar_url: 'https://i.pravatar.cc/150?u=fernanda',
+        category: 'actors'
+      },
+      {
+        id: 10,
+        title: 'Wagner Moura - De Tropa de Elite a Hollywood',
+        author: 'Carlos Oliveira',
+        authorType: 'user',
+        replies: 27,
+        lastActivity: '2024-05-17T08:30:00',
+        isPinned: false,
+        avatar_url: 'https://i.pravatar.cc/150?u=carlos',
+        category: 'actors'
+      }
+    ]
+  },
+  {
+    id: 'genres',
+    name: 'Gêneros Cinematográficos',
+    description: 'Debates sobre diferentes gêneros de filmes',
+    topics: [
+      {
+        id: 11,
+        title: 'O renascimento do Terror psicológico',
+        author: 'Maria Silva',
+        authorType: 'user',
+        replies: 36,
+        lastActivity: '2024-05-22T10:10:00',
+        isPinned: true,
+        avatar_url: 'https://i.pravatar.cc/150?u=maria',
+        category: 'genres'
+      },
+      {
+        id: 12,
+        title: 'Cinema Noir brasileiro',
+        author: 'João Costa',
+        authorType: 'moderator',
+        replies: 14,
+        lastActivity: '2024-05-15T13:45:00',
+        isPinned: false,
+        avatar_url: 'https://i.pravatar.cc/150?u=joao',
+        category: 'genres'
+      },
+      {
+        id: 13,
+        title: 'A evolução da comédia no cinema nacional',
+        author: 'Camila Santos',
+        authorType: 'user',
+        replies: 22,
+        lastActivity: '2024-05-16T17:30:00',
+        isPinned: false,
+        avatar_url: 'https://i.pravatar.cc/150?u=camila',
+        category: 'genres'
+      }
+    ]
+  }
+];
+
+// Online users data
+const onlineUsers: OnlineUser[] = [
+  { id: 1, name: 'Administrador', userType: 'admin', avatar_url: 'https://i.pravatar.cc/150?u=admin', lastActive: new Date().toISOString() },
+  { id: 2, name: 'João Costa', userType: 'moderator', avatar_url: 'https://i.pravatar.cc/150?u=joao', lastActive: new Date().toISOString() },
+  { id: 3, name: 'Maria Silva', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=maria', lastActive: new Date().toISOString() },
+  { id: 4, name: 'Carlos Oliveira', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=carlos', lastActive: new Date().toISOString() },
+  { id: 5, name: 'Ana Souza', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=ana', lastActive: new Date().toISOString() },
+  { id: 6, name: 'Lucas Mendes', userType: 'moderator', avatar_url: 'https://i.pravatar.cc/150?u=lucas', lastActive: new Date().toISOString() },
+  { id: 7, name: 'Fernanda Lima', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=fernanda', lastActive: new Date().toISOString() },
+  { id: 8, name: 'Paulo Ramos', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=paulo', lastActive: new Date().toISOString() },
+];
+
+// Recent posts data
+const recentPosts: RecentPost[] = [
+  {
+    id: 1, 
+    content: 'Acho que o trabalho dele em "Ilha do Medo" é subestimado. A forma como ele constrói tensão é incrível!', 
+    author: 'Lucas Mendes', 
+    avatar_url: 'https://i.pravatar.cc/150?u=lucas',
+    topic: 'Martin Scorsese - Retrospectiva',
+    timestamp: '2024-05-22T09:15:00'
   },
   {
     id: 2,
-    title: 'Oscar 2024 - Previsões e comentários',
-    author: 'João Costa',
-    authorType: 'moderator',
-    replies: 16,
-    lastActivity: '2024-05-16T09:45:00',
-    isPinned: false,
-    avatar_url: 'https://i.pravatar.cc/150?u=joao'
+    content: 'Wagner Moura realmente mostrou versatilidade ao interpretar personagens tão diferentes como Capitão Nascimento e Pablo Escobar.',
+    author: 'Ana Souza',
+    avatar_url: 'https://i.pravatar.cc/150?u=ana',
+    topic: 'Wagner Moura - De Tropa de Elite a Hollywood',
+    timestamp: '2024-05-22T08:30:00'
   },
   {
     id: 3,
-    title: 'Recomendações de filmes de suspense',
-    author: 'Carlos Oliveira',
-    authorType: 'admin',
-    replies: 32,
-    lastActivity: '2024-05-17T18:20:00',
-    isPinned: false,
-    avatar_url: 'https://i.pravatar.cc/150?u=carlos'
+    content: 'Kleber Mendonça Filho e Juliano Dornelles merecem mais reconhecimento internacional. "Bacurau" é uma obra-prima.',
+    author: 'Maria Silva',
+    avatar_url: 'https://i.pravatar.cc/150?u=maria',
+    topic: 'Diretores brasileiros contemporâneos',
+    timestamp: '2024-05-21T22:45:00'
   },
   {
     id: 4,
-    title: 'Qual o melhor filme de todos os tempos?',
-    author: 'Ana Santos',
-    authorType: 'user',
-    replies: 47,
-    lastActivity: '2024-05-18T11:10:00',
-    isPinned: false,
-    avatar_url: 'https://i.pravatar.cc/150?u=ana'
+    content: 'O uso de som em "Oppenheimer" é uma aula de como construir tensão sem depender de efeitos visuais.',
+    author: 'Paulo Ramos',
+    avatar_url: 'https://i.pravatar.cc/150?u=paulo',
+    topic: 'Christopher Nolan - Técnicas de filmagem',
+    timestamp: '2024-05-21T18:20:00'
+  },
+  {
+    id: 5,
+    content: 'Os filmes de terror psicológico brasileiros estão ganhando força, mas ainda precisamos de mais investimento no gênero.',
+    author: 'Carlos Oliveira',
+    avatar_url: 'https://i.pravatar.cc/150?u=carlos',
+    topic: 'O renascimento do Terror psicológico',
+    timestamp: '2024-05-21T14:05:00'
   }
 ];
 
@@ -97,37 +223,46 @@ const Forum = () => {
     return date.toLocaleDateString('pt-BR');
   };
   
-  const filteredTopics = searchQuery
-    ? ForumTopics.filter(topic => 
-        topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        topic.author.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : ForumTopics;
+  // Filter topics based on search query
+  const filteredCategories = searchQuery
+    ? forumCategories.map(category => ({
+        ...category,
+        topics: category.topics.filter(topic => 
+          topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          topic.author.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })).filter(category => category.topics.length > 0)
+    : forumCategories;
     
-  // Sort topics: rules first, then admin posts, then pinned, then by date
-  const sortedTopics = [...filteredTopics].sort((a, b) => {
-    // Rules thread always at the top
-    if (a.isRules) return -1;
-    if (b.isRules) return 1;
-    
-    // Admin posts next
-    if (a.authorType === 'admin' && b.authorType !== 'admin') return -1;
-    if (a.authorType !== 'admin' && b.authorType === 'admin') return 1;
-    
-    // Then pinned posts
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    
-    // Finally sort by date
-    return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
-  });
-  
   const handleTopicClick = (topic: ForumTopic) => {
     setSelectedTopic(topic);
   };
 
   const handleBack = () => {
     setSelectedTopic(null);
+  };
+  
+  const getInitials = (name: string) => {
+    return name.substring(0, 2).toUpperCase();
+  };
+  
+  const getAvatarColor = (name: string, type: 'user' | 'moderator' | 'admin') => {
+    if (type === 'admin') return 'bg-red-500';
+    if (type === 'moderator') return 'bg-purple-500';
+    
+    const colors = [
+      'bg-blue-500', 'bg-green-500', 
+      'bg-yellow-500', 'bg-indigo-500',
+      'bg-pink-500', 'bg-teal-500'
+    ];
+    
+    // Simple hash function to determine color
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    return colors[Math.abs(hash) % colors.length];
   };
   
   if (selectedTopic) {
@@ -275,171 +410,72 @@ const Forum = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <MessageSquare className="text-primary" />
-            Fórum de Discussões
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Participe das discussões sobre seus filmes favoritos
-          </p>
-        </div>
-        
-        <div className="w-full md:w-auto flex gap-2">
-          <Input
-            placeholder="Pesquisar tópicos..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full md:w-64"
-          />
-          <Button>
-            Novo Tópico
-          </Button>
-        </div>
-      </div>
-      
-      <div className="mb-6">
-        <Alert className="bg-primary/5">
-          <Info className="h-4 w-4 text-primary" />
-          <AlertTitle>Bem-vindo ao Fórum</AlertTitle>
-          <AlertDescription>
-            Por favor, leia as regras do fórum antes de participar. Os tópicos dos administradores são somente para informações importantes.
-          </AlertDescription>
-        </Alert>
-      </div>
-      
-      <div className="grid gap-4">
-        {sortedTopics.length > 0 ? (
-          sortedTopics.map((topic) => (
-            <TopicCard 
-              key={topic.id} 
-              topic={topic} 
-              formatDate={formatDate}
-              onClick={() => handleTopicClick(topic)}
-            />
-          ))
-        ) : (
-          <Card className="py-12">
-            <CardContent className="flex flex-col items-center justify-center text-center">
-              <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-medium">Nenhum tópico encontrado</h3>
-              <p className="text-muted-foreground mt-2">
-                {searchQuery ? 'Tente outra pesquisa' : 'Seja o primeiro a criar um tópico!'}
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-3/4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                <MessageSquare className="text-primary" />
+                Fórum de Discussões
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Participe das discussões sobre seus filmes favoritos
               </p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </motion.div>
-  );
-};
-
-interface TopicCardProps {
-  topic: ForumTopic;
-  formatDate: (dateString: string) => string;
-  onClick: () => void;
-}
-
-const TopicCard = ({ topic, formatDate, onClick }: TopicCardProps) => {
-  const getInitials = (name: string) => {
-    return name.substring(0, 2).toUpperCase();
-  };
-  
-  const getAvatarColor = (name: string, type: 'user' | 'moderator' | 'admin') => {
-    if (type === 'admin') return 'bg-red-500';
-    if (type === 'moderator') return 'bg-purple-500';
-    
-    const colors = [
-      'bg-blue-500', 'bg-green-500', 
-      'bg-yellow-500', 'bg-indigo-500',
-      'bg-pink-500', 'bg-teal-500'
-    ];
-    
-    // Simple hash function to determine color
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    
-    return colors[Math.abs(hash) % colors.length];
-  };
-
-  return (
-    <Card 
-      className={`transition-all hover:border-primary/20 hover:shadow-md cursor-pointer ${
-        topic.isRules ? 'border-primary/30 bg-primary/5' : 
-        topic.authorType === 'admin' ? 'border-red-200 bg-red-50/30' : ''
-      }`}
-      onClick={onClick}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-lg">
-              {topic.title}
-            </CardTitle>
+            </div>
             
-            {topic.isPinned && (
-              <Badge variant="secondary">
-                <Pin size={12} className="mr-1" />
-                Fixado
-              </Badge>
-            )}
-            
-            {topic.isRules && (
-              <Badge variant="default" className="ml-2">
-                Regras
-              </Badge>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Avatar className={topic.avatar_url ? '' : getAvatarColor(topic.author, topic.authorType)}>
-              {topic.avatar_url ? (
-                <AvatarImage src={topic.avatar_url} alt={topic.author} />
-              ) : null}
-              <AvatarFallback>{getInitials(topic.author)}</AvatarFallback>
-            </Avatar>
-            <div className="flex items-center">
-              {topic.authorType === 'admin' ? (
-                <Badge variant="default" className="flex items-center gap-1">
-                  <Shield size={12} />
-                  Admin
-                </Badge>
-              ) : topic.authorType === 'moderator' ? (
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Shield size={12} />
-                  Moderador
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <User size={12} />
-                  Usuário
-                </Badge>
-              )}
-              <span className="ml-2 text-sm text-muted-foreground">
-                {topic.author}
-              </span>
+            <div className="w-full md:w-auto flex gap-2">
+              <Input
+                placeholder="Pesquisar tópicos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full md:w-64"
+              />
+              <Button>
+                Novo Tópico
+              </Button>
             </div>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <MessageSquare size={14} />
-              {topic.replies} respostas
-            </span>
-            <span>
-              Atualizado em {formatDate(topic.lastActivity)}
-            </span>
+          <div className="mb-6">
+            <Alert className="bg-primary/5">
+              <Info className="h-4 w-4 text-primary" />
+              <AlertTitle>Bem-vindo ao Fórum</AlertTitle>
+              <AlertDescription>
+                Por favor, leia as regras do fórum antes de participar. Os tópicos dos administradores são somente para informações importantes.
+              </AlertDescription>
+            </Alert>
           </div>
+          
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((category) => (
+              <ForumCategoryComponent
+                key={category.id}
+                title={category.name}
+                description={category.description}
+                topics={category.topics}
+                formatDate={formatDate}
+                onTopicClick={handleTopicClick}
+              />
+            ))
+          ) : (
+            <Card className="py-12">
+              <CardContent className="flex flex-col items-center justify-center text-center">
+                <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-medium">Nenhum tópico encontrado</h3>
+                <p className="text-muted-foreground mt-2">
+                  {searchQuery ? 'Tente outra pesquisa' : 'Seja o primeiro a criar um tópico!'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        
+        <div className="w-full md:w-1/4 space-y-6">
+          <OnlineUsers users={onlineUsers} />
+          <RecentPosts posts={recentPosts} />
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
