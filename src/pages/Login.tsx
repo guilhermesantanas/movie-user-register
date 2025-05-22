@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 import PageTransition from '@/components/PageTransition';
 import AppHeader from '@/components/AppHeader';
@@ -19,7 +19,10 @@ const Login = () => {
   
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => {
+    // Initialize from localStorage if available
+    return localStorage.getItem('rememberMe') === 'true';
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [username, setUsername] = useState('');
 
@@ -63,23 +66,26 @@ const Login = () => {
   };
   
   const handleProfileClick = () => navigate('/profile');
+  
   const handleLogoutClick = async () => {
     await signOut();
-    navigate('/login');
+    // Stay on login page after logout
   };
   
   return (
     <PageTransition>
       <div className="min-h-screen py-12 px-6 flex items-center justify-center">
         <div className="w-full max-w-md">
-          <Button 
-            variant="outline" 
-            className="mb-6" 
-            onClick={() => navigate('/')}
-            icon={<ArrowLeft size={16} />}
-          >
-            Voltar para Início
-          </Button>
+          {user ? null : (
+            <Button 
+              variant="outline" 
+              className="mb-6" 
+              onClick={handleLogoutClick}
+              icon={<LogOut size={16} />}
+            >
+              Sair
+            </Button>
+          )}
           
           <AppHeader 
             title="Cinema Management" 
