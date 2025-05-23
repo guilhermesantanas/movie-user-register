@@ -65,36 +65,32 @@ const MovieFilter: React.FC<MovieFilterProps> = ({
           label="Gênero"
           options={genreOptions}
           value={filters.genre || ''}
-          onChange={(value) => handleFilterChange('genre', value)}
+          onChange={(e) => handleFilterChange('genre', e.target.value || null)}
           placeholder="Todos os gêneros"
-          clearable
         />
         
         <SelectField
           label="Classificação"
           options={ratingOptions}
           value={filters.rating || ''}
-          onChange={(value) => handleFilterChange('rating', value)}
+          onChange={(e) => handleFilterChange('rating', e.target.value || null)}
           placeholder="Todas as classificações"
-          clearable
         />
         
         <SelectField
           label="Idioma"
           options={languageOptions}
           value={filters.language || ''}
-          onChange={(value) => handleFilterChange('language', value)}
+          onChange={(e) => handleFilterChange('language', e.target.value || null)}
           placeholder="Todos os idiomas"
-          clearable
         />
         
         <SelectField
           label="Ano"
           options={yearOptions}
           value={filters.year || ''}
-          onChange={(value) => handleFilterChange('year', value)}
+          onChange={(e) => handleFilterChange('year', e.target.value || null)}
           placeholder="Todos os anos"
-          clearable
         />
       </div>
     </div>

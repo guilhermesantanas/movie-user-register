@@ -73,11 +73,11 @@ const Movies = () => {
                 <MovieFilter
                   filters={filters}
                   setFilters={setFilters}
+                  clearFilters={clearFilters}
                   genreOptions={genreOptions}
                   ratingOptions={ratingOptions}
                   languageOptions={languageOptions}
                   yearOptions={yearOptions}
-                  onClearFilters={clearFilters}
                 />
               </div>
             )}
