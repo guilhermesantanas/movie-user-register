@@ -45,11 +45,23 @@ const ForumCategory = ({
     return colors[Math.abs(hash) % colors.length];
   };
   
+  // Calculate total posts in this category (topics + all replies)
+  const totalTopics = topics.length;
+  const totalReplies = topics.reduce((total, topic) => total + topic.replies, 0);
+  const totalPosts = totalTopics + totalReplies;
+  
   return (
     <div className="mb-8">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold">{title}</h2>
-        <p className="text-muted-foreground text-sm">{description}</p>
+      <div className="mb-4 flex justify-between items-end">
+        <div>
+          <h2 className="text-xl font-bold">{title}</h2>
+          <p className="text-muted-foreground text-sm">{description}</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted px-3 py-1 rounded-md">
+          <MessageSquare size={14} />
+          <span>{totalPosts} posts</span>
+          <span className="text-xs">({totalTopics} tópicos, {totalReplies} respostas)</span>
+        </div>
       </div>
       
       <div className="grid gap-4">
@@ -118,7 +130,7 @@ const ForumCategory = ({
                 </div>
                 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
                     <MessageSquare size={14} />
                     {topic.replies} respostas
                   </span>
