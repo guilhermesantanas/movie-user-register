@@ -20,7 +20,7 @@ const MovieDetailsFields: React.FC<MovieDetailsFieldsProps> = ({
   return (
     <>
       <InputField
-        label="Release Date"
+        label="Data de Lançamento"
         id="release_date"
         name="release_date"
         type="date"
@@ -31,11 +31,11 @@ const MovieDetailsFields: React.FC<MovieDetailsFieldsProps> = ({
       />
 
       <InputField
-        label="Duration (minutes)"
+        label="Duração (minutos)"
         id="duration"
         name="duration"
         type="number"
-        placeholder="Enter duration in minutes"
+        placeholder="Digite a duração em minutos"
         value={formData.duration?.toString() || ""}
         onChange={onChange}
         error={errors.duration}
@@ -43,11 +43,11 @@ const MovieDetailsFields: React.FC<MovieDetailsFieldsProps> = ({
       />
 
       <InputField
-        label="IMDb Rating"
+        label="Avaliação IMDb"
         id="imdb_rating"
         name="imdb_rating"
         type="number"
-        placeholder="Enter IMDb rating (0-10)"
+        placeholder="Digite a avaliação IMDb (0-10)"
         value={formData.imdb_rating?.toString() || ""}
         onChange={onChange}
         error={errors.imdb_rating}
@@ -58,11 +58,11 @@ const MovieDetailsFields: React.FC<MovieDetailsFieldsProps> = ({
       />
 
       <InputField
-        label="Language"
+        label="Idioma"
         id="language"
         name="language"
         type="text"
-        placeholder="Enter movie language"
+        placeholder="Digite o idioma do filme"
         value={formData.language || ""}
         onChange={onChange}
         error={errors.language}
@@ -70,7 +70,7 @@ const MovieDetailsFields: React.FC<MovieDetailsFieldsProps> = ({
       />
 
       <SelectField
-        label="Rating"
+        label="Classificação"
         id="rating"
         name="rating"
         value={formData.rating || ""}

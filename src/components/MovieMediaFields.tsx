@@ -20,11 +20,11 @@ const MovieMediaFields: React.FC<MovieMediaFieldsProps> = ({
     <>
       <div className="md:col-span-2">
         <InputField
-          label="Poster URL"
+          label="URL do Poster"
           id="poster_url"
           name="poster_url"
           type="url"
-          placeholder="Enter poster image URL"
+          placeholder="Digite a URL da imagem do poster"
           value={formData.poster_url || ""}
           onChange={onChange}
           error={errors.poster_url}
@@ -34,11 +34,11 @@ const MovieMediaFields: React.FC<MovieMediaFieldsProps> = ({
       
       <div className="md:col-span-2">
         <InputField
-          label="Trailer URL"
+          label="URL do Trailer"
           id="trailer_url"
           name="trailer_url"
           type="url"
-          placeholder="Enter trailer URL (YouTube, Vimeo, etc.)"
+          placeholder="Digite a URL do trailer (YouTube, Vimeo, etc.)"
           value={formData.trailer_url || ""}
           onChange={onChange}
           error={errors.trailer_url}
@@ -48,10 +48,10 @@ const MovieMediaFields: React.FC<MovieMediaFieldsProps> = ({
 
       <div className="md:col-span-2">
         <TextareaField
-          label="Synopsis"
+          label="Sinopse"
           id="synopsis"
           name="synopsis"
-          placeholder="Enter movie synopsis"
+          placeholder="Digite a sinopse do filme"
           value={formData.synopsis || ""}
           onChange={onChange}
           error={errors.synopsis}

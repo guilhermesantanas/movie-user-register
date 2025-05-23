@@ -21,11 +21,11 @@ const MovieBasicInfoFields: React.FC<MovieBasicInfoFieldsProps> = ({
     <>
       <div className="md:col-span-2">
         <InputField
-          label="Movie Title"
+          label="Título do Filme"
           id="title"
           name="title"
           type="text"
-          placeholder="Enter movie title"
+          placeholder="Digite o título do filme"
           value={formData.title || ""}
           onChange={onChange}
           error={errors.title}
@@ -35,11 +35,11 @@ const MovieBasicInfoFields: React.FC<MovieBasicInfoFieldsProps> = ({
       </div>
 
       <InputField
-        label="Director"
+        label="Diretor"
         id="director"
         name="director"
         type="text"
-        placeholder="Enter director's name"
+        placeholder="Digite o nome do diretor"
         value={formData.director || ""}
         onChange={onChange}
         error={errors.director}
@@ -47,7 +47,7 @@ const MovieBasicInfoFields: React.FC<MovieBasicInfoFieldsProps> = ({
       />
 
       <SelectField
-        label="Genre"
+        label="Gênero"
         id="genre"
         name="genre"
         value={formData.genre || ""}
