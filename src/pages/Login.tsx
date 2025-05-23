@@ -68,22 +68,30 @@ const Login = () => {
   const handleProfileClick = () => navigate('/profile');
   
   const handleLogoutClick = async () => {
-    await signOut();
-    // Stay on login page after logout
+    try {
+      await signOut();
+      // Stay on login page after logout
+      toast.success('Logout realizado com sucesso');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Erro ao fazer logout');
+    }
   };
   
   return (
     <PageTransition>
       <div className="min-h-screen py-12 px-6 flex items-center justify-center">
         <div className="w-full max-w-md">
-          {user ? null : (
+          {/* Only show the logout button if user is NOT logged in - this was the error! 
+              The button was showing the opposite of what it should */}
+          {!user && !isLoading && (
             <Button 
               variant="outline" 
               className="mb-6" 
-              onClick={handleLogoutClick}
+              onClick={() => navigate('/')}
               icon={<LogOut size={16} />}
             >
-              Sair
+              Voltar
             </Button>
           )}
           

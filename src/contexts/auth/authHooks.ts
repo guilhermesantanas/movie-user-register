@@ -141,12 +141,11 @@ export const useAuthActions = () => {
     try {
       console.log("Starting sign in process for:", identifier);
       
-      // Handle admin login specifically - updated to use proper email format
-      if (identifier === 'admin' && password === 'admin123') {
-        // Using the admin email directly as it's expected by Supabase
+      // Handle admin login specifically
+      if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
         const { data, error } = await supabase.auth.signInWithPassword({
           email: 'admin@example.com',
-          password: 'admin123'  // Using the same password for simplicity
+          password: 'admin123'
         });
         
         if (error) throw error;
@@ -155,6 +154,7 @@ export const useAuthActions = () => {
         await ensureAdminProfile(data.user);
         
         toast.success('Login administrativo realizado com sucesso!');
+        localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
         return;
       }
       
@@ -185,7 +185,7 @@ export const useAuthActions = () => {
         }
         
         if (!profileData?.email) {
-          throw new Error('Email not found for username');
+          throw new Error('Email não encontrado para este nome de usuário');
         }
         
         console.log("Found email for username:", profileData.email);
