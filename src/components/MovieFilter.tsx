@@ -6,8 +6,8 @@ import SelectField from '@/components/SelectField';
 
 export interface MovieFilters {
   genre?: string;
-  rating?: string;
   language?: string;
+  rating?: string;
   year?: string;
 }
 
