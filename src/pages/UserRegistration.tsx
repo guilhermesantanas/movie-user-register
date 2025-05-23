@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -53,9 +54,9 @@ const UserRegistration = () => {
       return;
     }
 
-    // Validate name
+    // Validate username
     if (!formData.name.trim()) {
-      toast.error('Por favor, insira seu nome');
+      toast.error('Por favor, insira seu nome de usuário');
       return;
     }
     
@@ -126,10 +127,10 @@ const UserRegistration = () => {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InputField
-                  label="Nome Completo"
+                  label="Nome de Usuário"
                   id="name"
                   name="name"
-                  placeholder="Digite seu nome completo"
+                  placeholder="Digite seu nome de usuário"
                   required
                   value={formData.name}
                   onChange={handleChange}

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
@@ -9,10 +9,12 @@ import MovieCard from '@/components/MovieCard';
 import MoviesHeader from '@/components/MoviesHeader';
 import EmptyMoviesList from '@/components/EmptyMoviesList';
 import { useMoviesList } from '@/hooks/useMoviesList';
+import MovieFilter from '@/components/MovieFilter';
 
 const Movies = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const [showFilters, setShowFilters] = useState(false);
   
   const { 
     filteredMovies, 
@@ -20,7 +22,14 @@ const Movies = () => {
     usesSampleData,
     searchTerm,
     handleSearch,
-    handleDeleteMovie
+    handleDeleteMovie,
+    filters,
+    setFilters,
+    clearFilters,
+    genreOptions,
+    ratingOptions,
+    languageOptions,
+    yearOptions
   } = useMoviesList();
   
   const handleAddMovie = () => {
@@ -37,17 +46,41 @@ const Movies = () => {
         <div className="w-full max-w-6xl mx-auto">
           <MoviesHeader usesSampleData={usesSampleData} />
           
-          <div className="mb-8 max-w-md">
-            <InputField
-              label=""
-              id="search"
-              name="search"
-              placeholder="Buscar por título, diretor ou gênero"
-              value={searchTerm}
-              onChange={handleSearch}
-              icon={<Search size={18} />}
-              className="mb-0"
-            />
+          <div className="mb-6">
+            <div className="flex flex-col md:flex-row gap-3 items-start md:items-end">
+              <div className="w-full md:flex-1">
+                <InputField
+                  label=""
+                  id="search"
+                  name="search"
+                  placeholder="Buscar por título, diretor ou gênero"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  icon={<Search size={18} />}
+                  className="mb-0"
+                />
+              </div>
+              <button 
+                className="text-sm font-medium text-primary hover:underline"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
+              </button>
+            </div>
+            
+            {showFilters && (
+              <div className="mt-4">
+                <MovieFilter
+                  filters={filters}
+                  setFilters={setFilters}
+                  genreOptions={genreOptions}
+                  ratingOptions={ratingOptions}
+                  languageOptions={languageOptions}
+                  yearOptions={yearOptions}
+                  onClearFilters={clearFilters}
+                />
+              </div>
+            )}
           </div>
           
           {isLoading ? (
@@ -57,7 +90,7 @@ const Movies = () => {
           ) : filteredMovies.length === 0 ? (
             <EmptyMoviesList 
               isEmpty={filteredMovies.length === 0}
-              isSearching={searchTerm.trim() !== ''}
+              isSearching={searchTerm.trim() !== '' || Object.values(filters).some(Boolean)}
               isLoggedIn={isLoggedIn}
               onAddMovie={handleAddMovie}
             />
