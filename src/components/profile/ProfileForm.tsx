@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';
 import SelectField from '@/components/SelectField';
+import LanguageSelector from '@/components/LanguageSelector';
 import { UserProfileData } from '@/types/profile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -119,6 +120,7 @@ const ProfileForm = ({ profile, setProfile }: ProfileFormProps) => {
           birth_date: profile.birth_date,
           user_type: profile.user_type,
           avatar_url: profile.avatar_url,
+          language: profile.language,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'id'
@@ -129,6 +131,7 @@ const ProfileForm = ({ profile, setProfile }: ProfileFormProps) => {
       // Update localStorage for demo functionality
       localStorage.setItem('username', profile.name || '');
       localStorage.setItem('userType', profile.user_type || 'customer');
+      localStorage.setItem('userLanguage', profile.language || 'en');
       
       toast.success('Perfil atualizado com sucesso!');
     } catch (error: any) {
@@ -252,6 +255,11 @@ const ProfileForm = ({ profile, setProfile }: ProfileFormProps) => {
             { value: "au", label: "Austrália" }
           ]}
           icon={<MapPin size={18} />}
+        />
+
+        <LanguageSelector
+          value={profile?.language || 'en'}
+          onChange={handleInputChange}
         />
       </div>
       

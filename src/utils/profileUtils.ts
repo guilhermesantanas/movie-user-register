@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfileData } from '@/types/profile';
 import { User } from '@supabase/supabase-js';
+import { getLanguageFromCountry } from './languageUtils';
 
 export const createProfileFromUser = (user: User, profileData?: any): UserProfileData => {
   return {
@@ -13,7 +14,8 @@ export const createProfileFromUser = (user: User, profileData?: any): UserProfil
     country: profileData?.country || '',
     birth_date: profileData?.birth_date || '',
     user_type: profileData?.user_type || localStorage.getItem('userType') || 'customer',
-    avatar_url: profileData?.avatar_url || ''
+    avatar_url: profileData?.avatar_url || '',
+    language: profileData?.language || 'en'
   };
 };
 

@@ -10,10 +10,12 @@ import AppHeader from '@/components/AppHeader';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';
 import SelectField from '@/components/SelectField';
+import LanguageSelector from '@/components/LanguageSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/auth';
+import { getLanguageFromCountry } from '@/utils/languageUtils';
 
 const UserRegistration = () => {
   const navigate = useNavigate();
@@ -24,14 +26,26 @@ const UserRegistration = () => {
     email: '',
     password: '',
     dob: '',
-    country: ''
+    country: '',
+    language: 'en'
   });
   
   const [userConsent, setUserConsent] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Auto-sync language when country changes
+    if (name === 'country' && value) {
+      const suggestedLanguage = getLanguageFromCountry(value);
+      setFormData(prev => ({ 
+        ...prev, 
+        [name]: value,
+        language: suggestedLanguage
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +96,7 @@ const UserRegistration = () => {
           email: formData.email,
           birth_date: formData.dob,
           country: formData.country,
+          language: formData.language,
           user_type: 'customer' // Default to customer
         });
       
@@ -89,6 +104,9 @@ const UserRegistration = () => {
         console.error("Profile creation error:", profileError);
         throw profileError;
       }
+      
+      // Store language preference in localStorage
+      localStorage.setItem('userLanguage', formData.language);
       
       toast.success('Usuário registrado com sucesso! Faça login para continuar.');
       navigate('/login');
@@ -190,6 +208,12 @@ const UserRegistration = () => {
                     { value: "au", label: "Austrália" }
                   ]}
                   icon={<MapPin size={18} />}
+                />
+
+                <LanguageSelector
+                  label="Idioma Preferido"
+                  value={formData.language}
+                  onChange={handleChange}
                 />
               </div>
               

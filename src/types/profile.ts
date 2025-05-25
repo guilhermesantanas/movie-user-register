@@ -9,4 +9,5 @@ export interface UserProfileData {
   birth_date: string | null;
   user_type: string | null;
   avatar_url: string | null;
+  language: string | null;
 }
