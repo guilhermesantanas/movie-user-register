@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import { UserProfileData } from '@/types/profile';
 import { useAuth } from '@/contexts/auth';
+import { createProfileFromUser, fetchUserProfile } from '@/utils/profileUtils';
 
 const useUserProfile = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const useUserProfile = () => {
 
   // Fetch user profile data
   useEffect(() => {
-    const fetchProfile = async () => {
+    const loadProfile = async () => {
       try {
         // Check if user is authenticated
         if (!user) {
@@ -25,41 +25,11 @@ const useUserProfile = () => {
 
         // Use profile from auth context if available
         if (authProfile) {
-          setProfile({
-            id: user.id,
-            name: authProfile.name || user.user_metadata?.name || '',
-            email: user.email || '',
-            phone: authProfile.phone || '',
-            city: authProfile.city || '',
-            country: authProfile.country || '',
-            birth_date: authProfile.birth_date || '',
-            user_type: authProfile.user_type || localStorage.getItem('userType') || 'customer',
-            avatar_url: authProfile.avatar_url || ''
-          });
+          setProfile(createProfileFromUser(user, authProfile));
         } else {
-          // Try to get user profile from profiles table if not in auth context
-          const { data: profileData, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-          
-          if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
-            console.error('Error fetching profile:', error);
-          }
-          
-          // Use profile data from DB or create a new profile object from auth user
-          setProfile({
-            id: user.id,
-            name: profileData?.name || user.user_metadata?.name || '',
-            email: user.email || '',
-            phone: profileData?.phone || '',
-            city: profileData?.city || '',
-            country: profileData?.country || '',
-            birth_date: profileData?.birth_date || '',
-            user_type: profileData?.user_type || localStorage.getItem('userType') || 'customer',
-            avatar_url: profileData?.avatar_url || ''
-          });
+          // Try to get user profile from profiles table
+          const profileData = await fetchUserProfile(user.id);
+          setProfile(createProfileFromUser(user, profileData));
         }
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
@@ -69,7 +39,7 @@ const useUserProfile = () => {
       }
     };
 
-    fetchProfile();
+    loadProfile();
   }, [navigate, user, authProfile]);
 
   return { profile, setProfile, isLoading };

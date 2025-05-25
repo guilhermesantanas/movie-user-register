@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
@@ -8,14 +7,11 @@ import InputField from '@/components/InputField';
 import MovieCard from '@/components/MovieCard';
 import MoviesHeader from '@/components/MoviesHeader';
 import EmptyMoviesList from '@/components/EmptyMoviesList';
-import { useMoviesList } from '@/hooks/useMoviesList';
 import MovieFilter from '@/components/MovieFilter';
+import { useMoviesList } from '@/hooks/useMoviesList';
+import { useMoviesPage } from '@/hooks/useMoviesPage';
 
 const Movies = () => {
-  const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const [showFilters, setShowFilters] = useState(false);
-  
   const { 
     filteredMovies, 
     isLoading, 
@@ -31,14 +27,13 @@ const Movies = () => {
     languageOptions,
     yearOptions
   } = useMoviesList();
-  
-  const handleAddMovie = () => {
-    if (isLoggedIn) {
-      navigate('/register-movie');
-    } else {
-      navigate('/login');
-    }
-  };
+
+  const {
+    isLoggedIn,
+    showFilters,
+    setShowFilters,
+    handleAddMovie
+  } = useMoviesPage();
   
   return (
     <PageTransition>
