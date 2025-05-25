@@ -197,15 +197,15 @@ const UserRegistration = () => {
                   onChange={handleChange}
                   options={[
                     { value: "", label: "Selecione um país" },
-                    { value: "us", label: "Estados Unidos" },
-                    { value: "ca", label: "Canadá" },
-                    { value: "mx", label: "México" },
+                    { value: "au", label: "Austrália" },
                     { value: "br", label: "Brasil" },
+                    { value: "ca", label: "Canadá" },
+                    { value: "us", label: "Estados Unidos" },
                     { value: "fr", label: "França" },
-                    { value: "uk", label: "Reino Unido" },
                     { value: "de", label: "Alemanha" },
                     { value: "jp", label: "Japão" },
-                    { value: "au", label: "Austrália" }
+                    { value: "mx", label: "México" },
+                    { value: "uk", label: "Reino Unido" }
                   ]}
                   icon={<MapPin size={18} />}
                 />
