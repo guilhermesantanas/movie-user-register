@@ -15,7 +15,7 @@ interface LanguageSelectorProps {
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   value,
   onChange,
-  label = "Idioma Preferido",
+  label = "Preferred Language",
   id = "language",
   name = "language"
 }) => {
@@ -32,7 +32,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       value={value}
       onChange={onChange}
       options={[
-        { value: "", label: "Selecione um idioma" },
+        { value: "", label: "Select a language" },
         ...languageOptions
       ]}
       icon={<Globe size={18} />}

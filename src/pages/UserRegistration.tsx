@@ -22,12 +22,12 @@ const UserRegistration = () => {
             onClick={() => navigate('/')}
             icon={<ArrowLeft size={16} />}
           >
-            Voltar para Início
+            Back to Home
           </Button>
           
           <AppHeader 
             title="Cinema Management" 
-            subtitle="criar conta"
+            subtitle="create account"
           />
           
           <motion.div 

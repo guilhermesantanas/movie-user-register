@@ -52,25 +52,25 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
     e.preventDefault();
     
     if (!userConsent) {
-      toast.error('Você precisa concordar com os termos e condições para continuar.');
+      toast.error('You must agree to the terms and conditions to continue.');
       return;
     }
 
     // Validate email
     if (!formData.email.includes('@')) {
-      toast.error('Por favor, insira um email válido');
+      toast.error('Please enter a valid email address');
       return;
     }
 
     // Validate password
     if (formData.password.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres');
+      toast.error('Password must be at least 6 characters long');
       return;
     }
 
     // Validate username
     if (!formData.name.trim()) {
-      toast.error('Por favor, insira seu nome de usuário');
+      toast.error('Please enter your username');
       return;
     }
     
@@ -108,12 +108,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
       // Store language preference in localStorage
       localStorage.setItem('userLanguage', formData.language);
       
-      toast.success('Usuário registrado com sucesso! Faça login para continuar.');
+      toast.success('User registered successfully! Please log in to continue.');
       navigate('/login');
       onSuccess?.();
     } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error(`Erro ao registrar usuário: ${error.message}`);
+      toast.error(`Error registering user: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -123,10 +123,10 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <InputField
-          label="Nome de Usuário"
+          label="Username"
           id="name"
           name="name"
-          placeholder="Digite seu nome de usuário"
+          placeholder="Enter your username"
           required
           value={formData.name}
           onChange={handleChange}
@@ -138,7 +138,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
           id="email"
           name="email"
           type="email"
-          placeholder="Digite seu endereço de email"
+          placeholder="Enter your email address"
           required
           value={formData.email}
           onChange={handleChange}
@@ -146,11 +146,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
         />
         
         <InputField
-          label="Senha"
+          label="Password"
           id="password"
           name="password"
           type="password"
-          placeholder="Crie uma senha forte"
+          placeholder="Create a strong password"
           required
           value={formData.password}
           onChange={handleChange}
@@ -158,7 +158,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
         />
         
         <InputField
-          label="Data de Nascimento"
+          label="Date of Birth"
           id="dob"
           name="dob"
           type="date"
@@ -173,7 +173,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
         />
 
         <LanguageSelector
-          label="Idioma Preferido"
+          label="Preferred Language"
           value={formData.language}
           onChange={handleChange}
         />
@@ -190,7 +190,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
           className="w-full" 
           isLoading={isSubmitting}
         >
-          Registrar Usuário
+          Register User
         </Button>
       </div>
     </form>

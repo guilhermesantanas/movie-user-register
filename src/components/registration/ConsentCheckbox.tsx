@@ -21,10 +21,10 @@ const ConsentCheckbox: React.FC<ConsentCheckboxProps> = ({ checked, onChange }) 
           htmlFor="terms" 
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
-          Eu concordo com os termos e condições de uso do serviço
+          I agree to the terms and conditions of service
         </Label>
         <p className="text-sm text-muted-foreground">
-          Ao se cadastrar, você concorda com nossa política de privacidade e termos de uso.
+          By signing up, you agree to our privacy policy and terms of use.
         </p>
       </div>
     </div>

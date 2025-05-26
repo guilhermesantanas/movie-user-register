@@ -14,21 +14,21 @@ interface CountrySelectorProps {
 const CountrySelector: React.FC<CountrySelectorProps> = ({
   value,
   onChange,
-  label = "País",
+  label = "Country",
   id = "country",
   name = "country"
 }) => {
   const countryOptions = [
-    { value: "", label: "Selecione um país" },
-    { value: "au", label: "Austrália" },
-    { value: "br", label: "Brasil" },
-    { value: "ca", label: "Canadá" },
-    { value: "us", label: "Estados Unidos" },
-    { value: "fr", label: "França" },
-    { value: "de", label: "Alemanha" },
-    { value: "jp", label: "Japão" },
-    { value: "mx", label: "México" },
-    { value: "uk", label: "Reino Unido" }
+    { value: "", label: "Select a country" },
+    { value: "au", label: "Australia" },
+    { value: "br", label: "Brazil" },
+    { value: "ca", label: "Canada" },
+    { value: "fr", label: "France" },
+    { value: "de", label: "Germany" },
+    { value: "jp", label: "Japan" },
+    { value: "mx", label: "Mexico" },
+    { value: "uk", label: "United Kingdom" },
+    { value: "us", label: "United States" }
   ];
 
   return (

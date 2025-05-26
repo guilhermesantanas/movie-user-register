@@ -33,12 +33,12 @@ const UserProfile = () => {
             onClick={() => navigate('/')}
             icon={<ArrowLeft size={16} />}
           >
-            Voltar para Início
+            Back to Home
           </Button>
           
           <AppHeader 
             title="Cinema Management" 
-            subtitle="meu perfil"
+            subtitle="my profile"
           />
           
           <div className="card p-6 mt-6">
@@ -51,7 +51,7 @@ const UserProfile = () => {
               onClick={() => setPasswordDialogOpen(true)}
               icon={<Lock size={18} />}
             >
-              Alterar Senha
+              Change Password
             </Button>
           </div>
         </div>

@@ -18,7 +18,7 @@ const useUserProfile = () => {
       try {
         // Check if user is authenticated
         if (!user) {
-          toast.error('Você precisa estar logado para acessar esta página');
+          toast.error('You need to be logged in to access this page');
           navigate('/login');
           return;
         }
@@ -32,8 +32,8 @@ const useUserProfile = () => {
           setProfile(createProfileFromUser(user, profileData));
         }
       } catch (error) {
-        console.error('Erro ao carregar perfil:', error);
-        toast.error('Falha ao carregar informações do perfil');
+        console.error('Error loading profile:', error);
+        toast.error('Failed to load profile information');
       } finally {
         setIsLoading(false);
       }
