@@ -9,9 +9,13 @@ export const useAuthSession = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        if (!mounted) return;
+        
         console.log("Auth state change:", event, newSession?.user?.email);
         setSession(newSession);
         setUser(newSession?.user ?? null);
@@ -34,25 +38,37 @@ export const useAuthSession = () => {
     
     // THEN check for existing session
     const initializeAuth = async () => {
+      if (!mounted) return;
+      
       try {
         console.log("Initializing auth, getting session...");
         const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
         console.log("Initial session:", initialSession?.user?.email);
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
       } catch (error) {
         console.error('Error initializing auth:', error);
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
     
     initializeAuth();
     
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
   
   return {
     session,

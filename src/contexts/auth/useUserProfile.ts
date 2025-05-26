@@ -10,14 +10,14 @@ export const useUserProfile = (user: User | null) => {
   const [isModerator, setIsModerator] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setProfile(null);
-      setIsAdmin(false);
-      setIsModerator(false);
-      return;
-    }
-
     const fetchUserProfile = async () => {
+      if (!user) {
+        setProfile(null);
+        setIsAdmin(false);
+        setIsModerator(false);
+        return;
+      }
+
       try {
         const { data } = await supabase
           .from('profiles')
@@ -43,14 +43,23 @@ export const useUserProfile = (user: User | null) => {
           setIsAdmin(userType === 'admin' || user.email === 'admin@example.com');
           setIsModerator(userType === 'moderator' || userType === 'admin');
           localStorage.setItem('userType', userType);
+        } else {
+          // Reset states when no profile data
+          setProfile(null);
+          setIsAdmin(false);
+          setIsModerator(false);
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
+        // Reset states on error
+        setProfile(null);
+        setIsAdmin(false);
+        setIsModerator(false);
       }
     };
 
     fetchUserProfile();
-  }, [user]);
+  }, [user?.id, user?.email]); // Only depend on user id and email to prevent unnecessary re-renders
   
   return {
     profile,

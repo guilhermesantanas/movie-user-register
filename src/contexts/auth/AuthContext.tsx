@@ -7,12 +7,22 @@ import { AuthContextType } from './types';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // Always call hooks in the same order
   const state = useAuthState();
   const actions = useAuthActions();
 
-  const value = {
-    ...state,
-    ...actions
+  const value: AuthContextType = {
+    // Spread state first
+    session: state.session,
+    user: state.user,
+    profile: state.profile,
+    isLoading: state.isLoading,
+    isAdmin: state.isAdmin,
+    isModerator: state.isModerator,
+    // Then actions
+    signIn: actions.signIn,
+    signUp: actions.signUp,
+    signOut: actions.signOut
   };
 
   return (
