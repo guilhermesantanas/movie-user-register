@@ -40,7 +40,17 @@ const isValidUrl = (url: string): boolean => {
 
 export const prepareMovieDataForSubmission = (formData: MovieFormData, userEmail: string) => {
   return {
-    ...formData,
+    title: formData.title, // Ensure title is explicitly included and required
+    director: formData.director,
+    genre: formData.genre,
+    release_date: formData.release_date,
+    duration: formData.duration,
+    imdb_rating: formData.imdb_rating,
+    language: formData.language,
+    rating: formData.rating,
+    synopsis: formData.synopsis,
+    poster_url: formData.poster_url,
+    trailer_url: formData.trailer_url,
     registered_by: userEmail
   };
 };
