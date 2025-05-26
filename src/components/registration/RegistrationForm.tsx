@@ -1,14 +1,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
-import InputField from '@/components/InputField';
-import Button from '@/components/Button';
-import LanguageSelector from '@/components/LanguageSelector';
-import CountrySelector from '@/components/registration/CountrySelector';
-import ConsentCheckbox from '@/components/registration/ConsentCheckbox';
+import FormFields from '@/components/registration/FormFields';
+import SubmitSection from '@/components/registration/SubmitSection';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/auth';
 import { getLanguageFromCountry } from '@/utils/languageUtils';
@@ -121,78 +117,16 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <InputField
-          label="Username"
-          id="name"
-          name="name"
-          placeholder="Enter your username"
-          required
-          value={formData.name}
-          onChange={handleChange}
-          icon={<User size={18} />}
-        />
-        
-        <InputField
-          label="Email"
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Enter your email address"
-          required
-          value={formData.email}
-          onChange={handleChange}
-          icon={<Mail size={18} />}
-        />
-        
-        <InputField
-          label="Password"
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Create a strong password"
-          required
-          value={formData.password}
-          onChange={handleChange}
-          icon={<Lock size={18} />}
-        />
-        
-        <InputField
-          label="Date of Birth"
-          id="dob"
-          name="dob"
-          type="date"
-          value={formData.dob}
-          onChange={handleChange}
-          icon={<Calendar size={18} />}
-        />
-        
-        <CountrySelector
-          value={formData.country}
-          onChange={handleChange}
-        />
-
-        <LanguageSelector
-          label="Preferred Language"
-          value={formData.language}
-          onChange={handleChange}
-        />
-      </div>
-      
-      <ConsentCheckbox
-        checked={userConsent}
-        onChange={setUserConsent}
+      <FormFields 
+        formData={formData}
+        onChange={handleChange}
       />
       
-      <div className="mt-6">
-        <Button 
-          type="submit" 
-          className="w-full" 
-          isLoading={isSubmitting}
-        >
-          Register User
-        </Button>
-      </div>
+      <SubmitSection 
+        userConsent={userConsent}
+        onConsentChange={setUserConsent}
+        isSubmitting={isSubmitting}
+      />
     </form>
   );
 };
