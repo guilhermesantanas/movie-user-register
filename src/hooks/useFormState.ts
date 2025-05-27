@@ -1,6 +1,5 @@
 
 import { useState, useCallback } from 'react';
-import { validateRequired } from '@/utils/formValidation';
 
 export interface FormField<T = string> {
   value: T;
@@ -22,7 +21,7 @@ export const useFormState = <T extends Record<string, any>>({
     
     Object.keys(initialValues).forEach(key => {
       initialFields[key as keyof T] = {
-        value: initialValues[key],
+        value: initialValues[key as keyof T],
         error: null,
         touched: false
       };
@@ -93,8 +92,9 @@ export const useFormState = <T extends Record<string, any>>({
     const resetFields: Record<keyof T, FormField> = {} as any;
     
     Object.keys(initialValues).forEach(key => {
-      resetFields[key as keyof T] = {
-        value: initialValues[key as keyof T],
+      const fieldKey = key as keyof T;
+      resetFields[fieldKey] = {
+        value: initialValues[fieldKey],
         error: null,
         touched: false
       };
