@@ -19,7 +19,7 @@ export const useProfileManagement = () => {
           phone: profileData.phone,
           city: profileData.city,
           country: profileData.country,
-          birth_date: profileData.birthDate
+          birth_date: profileData.birth_date
         })
         .eq('id', userId);
 

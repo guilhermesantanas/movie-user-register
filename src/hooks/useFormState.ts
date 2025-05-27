@@ -94,7 +94,7 @@ export const useFormState = <T extends Record<string, any>>({
     
     Object.keys(initialValues).forEach(key => {
       resetFields[key as keyof T] = {
-        value: initialValues[key],
+        value: initialValues[key as keyof T],
         error: null,
         touched: false
       };
