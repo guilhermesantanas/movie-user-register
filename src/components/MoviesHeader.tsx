@@ -18,7 +18,7 @@ const MoviesHeader = ({ usesSampleData }: MoviesHeaderProps) => {
     if (isLoggedIn) {
       navigate('/register-movie');
     } else {
-      toast.error('Você precisa estar logado para adicionar um filme');
+      toast.error('You need to be logged in to add a movie');
       navigate('/login');
     }
   };
@@ -33,12 +33,12 @@ const MoviesHeader = ({ usesSampleData }: MoviesHeaderProps) => {
           onClick={() => navigate('/')}
         >
           <ArrowLeft size={16} className="mr-2" />
-          Voltar para Início
+          Back to Home
         </Button>
         
         <AppHeader 
-          title="Coleção de Filmes" 
-          subtitle={usesSampleData ? "Navegando por dados de filmes de exemplo" : "Navegue pelo nosso banco de dados de filmes"}
+          title="Movie Collection" 
+          subtitle={usesSampleData ? "Browsing sample movie data" : "Browse our movie database"}
           className="mb-0"
         />
       </div>
@@ -49,7 +49,7 @@ const MoviesHeader = ({ usesSampleData }: MoviesHeaderProps) => {
           className="w-full md:w-auto"
         >
           <Plus size={18} className="mr-2" />
-          Cadastrar Novo Filme
+          Register New Movie
         </Button>
       </div>
     </div>

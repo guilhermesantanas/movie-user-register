@@ -19,15 +19,15 @@ const Navbar = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast.success('Logout realizado com sucesso');
+      toast.success('Successfully logged out');
       navigate('/');
     } catch (error) {
-      toast.error('Erro ao fazer logout');
+      toast.error('Error logging out');
       console.error(error);
     }
   };
   
-  if (!user) return null; // Não mostrar a navbar se o usuário não estiver logado
+  if (!user) return null; // Don't show navbar if user is not logged in
   
   return (
     <motion.nav 
@@ -47,17 +47,17 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-4">
               <NavLink to="/" active={isActive('/')}>
                 <Home size={18} />
-                <span>Início</span>
+                <span>Home</span>
               </NavLink>
               
               <NavLink to="/movies" active={isActive('/movies')}>
                 <Film size={18} />
-                <span>Filmes</span>
+                <span>Movies</span>
               </NavLink>
               
               <NavLink to="/forum" active={isActive('/forum')}>
                 <MessageSquare size={18} />
-                <span>Fórum</span>
+                <span>Forum</span>
               </NavLink>
             </div>
           </div>
@@ -89,22 +89,22 @@ const Navbar = () => {
         <div className="grid grid-cols-4 gap-1 px-2 py-1">
           <MobileNavLink to="/" active={isActive('/')}>
             <Home size={20} />
-            <span className="text-xs">Início</span>
+            <span className="text-xs">Home</span>
           </MobileNavLink>
           
           <MobileNavLink to="/movies" active={isActive('/movies')}>
             <Film size={20} />
-            <span className="text-xs">Filmes</span>
+            <span className="text-xs">Movies</span>
           </MobileNavLink>
           
           <MobileNavLink to="/forum" active={isActive('/forum')}>
             <MessageSquare size={20} />
-            <span className="text-xs">Fórum</span>
+            <span className="text-xs">Forum</span>
           </MobileNavLink>
           
           <MobileNavLink to="/profile" active={isActive('/profile')}>
             <User size={20} />
-            <span className="text-xs">Perfil</span>
+            <span className="text-xs">Profile</span>
           </MobileNavLink>
         </div>
       </div>

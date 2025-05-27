@@ -19,7 +19,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
   name = "country"
 }) => {
   const countryOptions = [
-    { value: "", label: "Select a country" },
+    { value: "", label: "Choose your country" },
     { value: "au", label: "Australia" },
     { value: "br", label: "Brazil" },
     { value: "ca", label: "Canada" },
@@ -40,6 +40,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
       onChange={onChange}
       options={countryOptions}
       icon={<MapPin size={18} />}
+      placeholder="Choose your country"
     />
   );
 };

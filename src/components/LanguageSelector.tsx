@@ -32,10 +32,11 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       value={value}
       onChange={onChange}
       options={[
-        { value: "", label: "Select a language" },
+        { value: "", label: "Choose your language" },
         ...languageOptions
       ]}
       icon={<Globe size={18} />}
+      placeholder="Choose your language"
     />
   );
 };

@@ -12,8 +12,8 @@ const Index = () => {
       <div className="min-h-screen flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-md">
           <AppHeader 
-            title="Gerenciamento de Cinema" 
-            subtitle="Explore nossa coleção de filmes com facilidade"
+            title="Cinema Management" 
+            subtitle="Explore our movie collection with ease"
           />
           
           <motion.div 
@@ -35,7 +35,7 @@ const Index = () => {
               icon={<LogIn size={18} />}
               className="hover:border-primary/30"
             >
-              Entrar
+              Sign In
             </NavLink>
             
             <NavLink 
@@ -43,7 +43,7 @@ const Index = () => {
               icon={<UserPlus size={18} />}
               className="hover:border-primary/30"
             >
-              Cadastrar Novo Usuário
+              Register New User
             </NavLink>
           </motion.div>
           
@@ -53,7 +53,7 @@ const Index = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.5 }}
           >
-            Selecione uma opção para começar
+            Select an option to get started
           </motion.p>
         </div>
       </div>
