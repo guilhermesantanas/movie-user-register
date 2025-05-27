@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 
-export interface FormField<T = string> {
+export interface FormField<T = any> {
   value: T;
   error: string | null;
   touched: boolean;
@@ -16,12 +16,13 @@ export const useFormState = <T extends Record<string, any>>({
   initialValues,
   validators = {}
 }: UseFormStateOptions<T>) => {
-  const [fields, setFields] = useState<Record<keyof T, FormField>>(() => {
-    const initialFields: Record<keyof T, FormField> = {} as any;
+  const [fields, setFields] = useState<Record<keyof T, FormField<T[keyof T]>>>(() => {
+    const initialFields: Record<keyof T, FormField<T[keyof T]>> = {} as any;
     
     Object.keys(initialValues).forEach(key => {
-      initialFields[key as keyof T] = {
-        value: initialValues[key as keyof T],
+      const fieldKey = key as keyof T;
+      initialFields[fieldKey] = {
+        value: initialValues[fieldKey],
         error: null,
         touched: false
       };
@@ -30,7 +31,7 @@ export const useFormState = <T extends Record<string, any>>({
     return initialFields;
   });
 
-  const updateField = useCallback((name: keyof T, value: any) => {
+  const updateField = useCallback((name: keyof T, value: T[keyof T]) => {
     setFields(prev => ({
       ...prev,
       [name]: {
@@ -89,7 +90,7 @@ export const useFormState = <T extends Record<string, any>>({
   }, [fields, validators]);
 
   const reset = useCallback(() => {
-    const resetFields: Record<keyof T, FormField> = {} as any;
+    const resetFields: Record<keyof T, FormField<T[keyof T]>> = {} as any;
     
     Object.keys(initialValues).forEach(key => {
       const fieldKey = key as keyof T;
@@ -103,14 +104,15 @@ export const useFormState = <T extends Record<string, any>>({
     setFields(resetFields);
   }, [initialValues]);
 
-  const getValues = useCallback(() => {
-    const values: Partial<T> = {};
+  const getValues = useCallback((): T => {
+    const values = {} as T;
     
     Object.keys(fields).forEach(key => {
-      values[key as keyof T] = fields[key as keyof T].value;
+      const fieldKey = key as keyof T;
+      values[fieldKey] = fields[fieldKey].value;
     });
     
-    return values as T;
+    return values;
   }, [fields]);
 
   const hasErrors = Object.values(fields).some(field => field.error !== null);
