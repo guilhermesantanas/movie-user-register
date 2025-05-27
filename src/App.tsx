@@ -24,8 +24,8 @@ import Navbar from "./components/Navbar";
 // Create a client
 const queryClient = new QueryClient();
 
-// App wrapper to use hooks
-const AppWithHooks = () => {
+// App content component that uses auth hooks
+const AppContent = () => {
   useSessionPersistence();
   
   return (
@@ -77,7 +77,7 @@ const App = () => (
       <TooltipProvider>
         <BrowserRouter>
           <AuthProvider>
-            <AppWithHooks />
+            <AppContent />
             <Toaster />
             <Sonner />
           </AuthProvider>
