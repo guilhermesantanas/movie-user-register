@@ -1,14 +1,14 @@
 
 export const countryLanguageMap: Record<string, string> = {
-  'br': 'pt',
-  'us': 'en',
-  'ca': 'en',
-  'mx': 'es',
-  'fr': 'fr',
-  'uk': 'en',
-  'de': 'de',
-  'jp': 'ja',
-  'au': 'en'
+  'BR': 'pt',
+  'US': 'en',
+  'CA': 'en',
+  'MX': 'es',
+  'FR': 'fr',
+  'GB': 'en',
+  'DE': 'de',
+  'JP': 'ja',
+  'AU': 'en'
 };
 
 export const languageNames: Record<string, string> = {

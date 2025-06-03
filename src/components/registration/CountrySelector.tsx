@@ -20,15 +20,15 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 }) => {
   const countryOptions = [
     { value: "", label: "Choose your country" },
-    { value: "au", label: "Australia" },
-    { value: "br", label: "Brazil" },
-    { value: "ca", label: "Canada" },
-    { value: "fr", label: "France" },
-    { value: "de", label: "Germany" },
-    { value: "jp", label: "Japan" },
-    { value: "mx", label: "Mexico" },
-    { value: "uk", label: "United Kingdom" },
-    { value: "us", label: "United States" }
+    { value: "AU", label: "Australia" },
+    { value: "BR", label: "Brazil" },
+    { value: "CA", label: "Canada" },
+    { value: "FR", label: "France" },
+    { value: "DE", label: "Germany" },
+    { value: "JP", label: "Japan" },
+    { value: "MX", label: "Mexico" },
+    { value: "GB", label: "United Kingdom" },
+    { value: "US", label: "United States" }
   ];
 
   return (

@@ -44,7 +44,7 @@ const MovieFilter: React.FC<MovieFilterProps> = ({
       <div className="flex flex-wrap gap-4 items-center mb-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Filter size={16} />
-          <h3 className="font-medium">Filtros</h3>
+          <h3 className="font-medium">Filters</h3>
         </div>
         
         {hasActiveFilters && (
@@ -55,42 +55,42 @@ const MovieFilter: React.FC<MovieFilterProps> = ({
             className="ml-auto flex items-center gap-1"
           >
             <X size={14} />
-            Limpar filtros
+            Clear filters
           </Button>
         )}
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <SelectField
-          label="Gênero"
+          label="Genre"
           options={genreOptions}
           value={filters.genre || ''}
           onChange={(e) => handleFilterChange('genre', e.target.value || null)}
-          placeholder="Todos os gêneros"
+          placeholder="All genres"
         />
         
         <SelectField
-          label="Classificação"
+          label="Rating"
           options={ratingOptions}
           value={filters.rating || ''}
           onChange={(e) => handleFilterChange('rating', e.target.value || null)}
-          placeholder="Todas as classificações"
+          placeholder="All ratings"
         />
         
         <SelectField
-          label="Idioma"
+          label="Language"
           options={languageOptions}
           value={filters.language || ''}
           onChange={(e) => handleFilterChange('language', e.target.value || null)}
-          placeholder="Todos os idiomas"
+          placeholder="All languages"
         />
         
         <SelectField
-          label="Ano"
+          label="Year"
           options={yearOptions}
           value={filters.year || ''}
           onChange={(e) => handleFilterChange('year', e.target.value || null)}
-          placeholder="Todos os anos"
+          placeholder="All years"
         />
       </div>
     </div>

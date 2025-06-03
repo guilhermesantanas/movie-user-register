@@ -49,12 +49,12 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
     
     if (isDeleting) return;
     
-    if (window.confirm(`Tem certeza que deseja excluir o filme "${movie.title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete the movie "${movie.title}"?`)) {
       try {
         setIsDeleting(true);
         await onDelete(movie.id);
       } catch (error) {
-        console.error('Erro ao excluir filme:', error);
+        console.error('Error deleting movie:', error);
       } finally {
         setIsDeleting(false);
       }
@@ -94,7 +94,7 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{isDeleting ? 'Excluindo...' : 'Excluir filme'}</p>
+              <p>{isDeleting ? 'Deleting...' : 'Delete movie'}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -123,7 +123,7 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
           <span>{movie.genre}</span>
         </div>
         <p className="text-sm text-muted-foreground mb-2">
-          Diretor: {movie.director}
+          Director: {movie.director}
         </p>
         
         <HoverCard>
@@ -133,14 +133,14 @@ const MovieCard = ({ movie, onDelete }: MovieCardProps) => {
             </p>
           </HoverCardTrigger>
           <HoverCardContent className="w-96 text-sm">
-            <h4 className="font-bold mb-2">Sinopse</h4>
+            <h4 className="font-bold mb-2">Synopsis</h4>
             {movie.synopsis}
           </HoverCardContent>
         </HoverCard>
         
         {movie.registered_by && (
           <p className="text-xs text-muted-foreground mt-3">
-            Adicionado por: {movie.registered_by}
+            Added by: {movie.registered_by}
           </p>
         )}
       </div>

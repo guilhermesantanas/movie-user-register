@@ -48,12 +48,12 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
             .single();
           
           setUser(session.user);
-          setUserName(profileData?.name || session.user.email || 'Usuário');
+          setUserName(profileData?.name || session.user.email || 'User');
           setUserAvatar(profileData?.avatar_url || null);
           setIsAdmin(profileData?.user_type === 'admin');
         }
       } catch (error) {
-        toast.error('Erro ao carregar informações do usuário');
+        toast.error('Error loading user information');
       } finally {
         setLoading(false);
       }
@@ -98,8 +98,8 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         setComments(commentsWithAvatars || []);
       } catch (error) {
         uiToast({
-          title: "Erro",
-          description: "Falha ao carregar comentários",
+          title: "Error",
+          description: "Failed to load comments",
           variant: "destructive",
         });
       } finally {
@@ -132,12 +132,12 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
 
   const handleAddComment = async () => {
     if (!user) {
-      toast("Por favor, faça login para adicionar um comentário");
+      toast("Please log in to add a comment");
       return;
     }
 
     if (!newComment.trim()) {
-      toast("Por favor, digite algum texto para seu comentário");
+      toast("Please enter some text for your comment");
       return;
     }
 
@@ -155,10 +155,10 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         
       if (error) throw error;
       
-      toast("Seu comentário foi publicado");
+      toast("Your comment has been posted");
       setNewComment('');
     } catch (error: any) {
-      toast("Falha ao publicar comentário: " + (error.message || "Erro desconhecido"));
+      toast("Failed to post comment: " + (error.message || "Unknown error"));
     } finally {
       setSubmitting(false);
     }
@@ -171,7 +171,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     const canDelete = isAdmin || user.id === commentUserId;
     
     if (!canDelete) {
-      toast("Você só pode excluir seus próprios comentários");
+      toast("You can only delete your own comments");
       return;
     }
     
@@ -183,12 +183,12 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
         
       if (error) throw error;
       
-      toast("O comentário foi removido");
+      toast("Comment has been removed");
       
       // Update the local state
       setComments(comments.filter(comment => comment.id !== commentId));
     } catch (error: any) {
-      toast("Falha ao excluir comentário: " + (error.message || "Erro desconhecido"));
+      toast("Failed to delete comment: " + (error.message || "Unknown error"));
     }
   };
 
@@ -217,7 +217,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
     <div className="mt-8">
       <h3 className="text-xl font-semibold mb-4 flex items-center">
         <MessageSquare className="mr-2 h-5 w-5" />
-        Comentários ({comments.length})
+        Comments ({comments.length})
       </h3>
       
       {user && (
@@ -225,7 +225,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
           <Textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Compartilhe seus pensamentos sobre este filme..."
+            placeholder="Share your thoughts about this movie..."
             className="mb-2 resize-none"
             rows={3}
           />
@@ -234,7 +234,7 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
               onClick={handleAddComment}
               disabled={submitting || !newComment.trim()}
             >
-              Publicar Comentário
+              Post Comment
             </Button>
             
             {isAdmin && (
@@ -249,15 +249,15 @@ const MovieComments = ({ movieId }: MovieCommentsProps) => {
       
       {!user && (
         <div className="mb-6 p-4 border rounded-md bg-muted">
-          <p className="text-center">Por favor, faça login para adicionar comentários</p>
+          <p className="text-center">Please log in to add comments</p>
         </div>
       )}
       
       {loading ? (
-        <div className="text-center p-4">Carregando comentários...</div>
+        <div className="text-center p-4">Loading comments...</div>
       ) : comments.length === 0 ? (
         <div className="text-center p-4 text-muted-foreground">
-          Nenhum comentário ainda. Seja o primeiro a compartilhar seus pensamentos!
+          No comments yet. Be the first to share your thoughts!
         </div>
       ) : (
         <div className="space-y-4">

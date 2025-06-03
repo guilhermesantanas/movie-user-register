@@ -28,7 +28,7 @@ const MoviePoster = ({
   const handleRateMovie = async (rating: number) => {
     try {
       if (!userLoggedIn) {
-        toast("Você precisa estar logado para avaliar este filme");
+        toast("You need to be logged in to rate this movie");
         return;
       }
       
@@ -36,8 +36,8 @@ const MoviePoster = ({
       await onRateMovie(rating);
       
     } catch (error) {
-      console.error('Erro ao avaliar filme:', error);
-      toast("Ocorreu um erro ao enviar sua avaliação");
+      console.error('Error rating movie:', error);
+      toast("An error occurred while submitting your rating");
     }
   };
   
@@ -52,7 +52,7 @@ const MoviePoster = ({
       </div>
 
       <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-2">Avaliação do Filme</h3>
+        <h3 className="text-lg font-semibold mb-2">Movie Rating</h3>
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2">
             <RatingStars 
@@ -61,13 +61,13 @@ const MoviePoster = ({
               maxRating={5}
             />
             <span className="text-sm text-muted-foreground">
-              ({displayRating.toFixed(1)}/5 de {ratingCount} {ratingCount === 1 ? 'usuário' : 'usuários'})
+              ({displayRating.toFixed(1)}/5 from {ratingCount} {ratingCount === 1 ? 'user' : 'users'})
             </span>
           </div>
           
           {userLoggedIn && (
             <div className="mt-4">
-              <p className="text-sm mb-1">Sua Avaliação:</p>
+              <p className="text-sm mb-1">Your Rating:</p>
               <RatingStars
                 currentRating={userRating ? userRating / 2 : 0}
                 onRatingChange={(rating) => handleRateMovie(rating * 2)} // Convert 5-scale back to 10-scale
@@ -79,7 +79,7 @@ const MoviePoster = ({
           
           {!userLoggedIn && (
             <p className="text-sm text-muted-foreground mt-2">
-              Faça login para avaliar este filme
+              Please log in to rate this movie
             </p>
           )}
         </div>
