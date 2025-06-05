@@ -3,7 +3,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Film, Plus } from 'lucide-react';
 import Button from '@/components/Button';
-import { useNavigate } from 'react-router-dom';
 
 interface EmptyMoviesListProps {
   isEmpty: boolean;

@@ -7,11 +7,21 @@ export interface Movie {
   genre: string;
   director: string;
   synopsis: string;
-  poster_url: string;  // Changed from optional to required
-  registered_by: string;  // Changed from optional to required
-  imdb_rating: number;  // Changed from optional to required
-  language: string;  // Changed from optional to required
-  rating: string;  // Changed from optional to required
-  trailer_url: string;  // Changed from optional to required
-  created_at: string;  // Already changed from optional to required
+  poster_url?: string;
+  registered_by?: string;
+  imdb_rating?: number;
+  language?: string;
+  rating?: string;
+  trailer_url?: string;
+  created_at: string;
+}
+
+// Extended interface for movies with required fields (used in components that ensure data completeness)
+export interface CompleteMovie extends Movie {
+  poster_url: string;
+  registered_by: string;
+  imdb_rating: number;
+  language: string;
+  rating: string;
+  trailer_url: string;
 }

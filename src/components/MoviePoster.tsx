@@ -1,10 +1,10 @@
 
 import React from 'react';
 import RatingStars from '@/components/RatingStars';
-import { toast } from 'sonner';
+import { showToast } from '@/utils/toastUtils';
 
 interface MoviePosterProps {
-  posterUrl: string;
+  posterUrl?: string;
   title: string;
   averageRating: number;
   ratingCount: number;
@@ -28,7 +28,7 @@ const MoviePoster = ({
   const handleRateMovie = async (rating: number) => {
     try {
       if (!userLoggedIn) {
-        toast("You need to be logged in to rate this movie");
+        showToast.info("You need to be logged in to rate this movie");
         return;
       }
       
@@ -37,7 +37,7 @@ const MoviePoster = ({
       
     } catch (error) {
       console.error('Error rating movie:', error);
-      toast("An error occurred while submitting your rating");
+      showToast.error("An error occurred while submitting your rating");
     }
   };
   

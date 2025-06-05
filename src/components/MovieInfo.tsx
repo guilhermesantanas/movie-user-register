@@ -10,8 +10,8 @@ interface MovieInfoProps {
     genre: string;
     release_date: string;
     duration: number;
-    language?: string;  // Changed to optional
-    imdb_rating?: number; // Changed to optional
+    language?: string;
+    imdb_rating?: number;
     synopsis: string;
     trailer_url?: string;
   };
@@ -19,6 +19,19 @@ interface MovieInfoProps {
 
 const MovieInfo = ({ movie }: MovieInfoProps) => {
   const [trailerOpen, setTrailerOpen] = useState(false);
+
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return 'Not specified';
+    }
+  };
+
+  const formatRating = (rating?: number) => {
+    if (rating === undefined || rating === null) return 'Not rated';
+    return rating.toString();
+  };
 
   return (
     <>
@@ -58,7 +71,7 @@ const MovieInfo = ({ movie }: MovieInfoProps) => {
         </div>
         <div>
           <h3 className="text-sm font-medium text-muted-foreground">Release Date</h3>
-          <p>{movie.release_date ? new Date(movie.release_date).toLocaleDateString() : 'Not specified'}</p>
+          <p>{formatDate(movie.release_date)}</p>
         </div>
         <div>
           <h3 className="text-sm font-medium text-muted-foreground">Duration</h3>
@@ -70,7 +83,7 @@ const MovieInfo = ({ movie }: MovieInfoProps) => {
         </div>
         <div>
           <h3 className="text-sm font-medium text-muted-foreground">IMDb Rating</h3>
-          <p>{movie.imdb_rating || 'Not rated'}</p>
+          <p>{formatRating(movie.imdb_rating)}</p>
         </div>
       </div>
       

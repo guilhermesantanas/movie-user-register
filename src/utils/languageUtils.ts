@@ -27,3 +27,31 @@ export const getLanguageFromCountry = (country: string): string => {
 export const getLanguageName = (code: string): string => {
   return languageNames[code] || 'English';
 };
+
+// Helper to get all available languages for dropdowns
+export const getAllLanguages = () => {
+  return Object.entries(languageNames).map(([code, name]) => ({
+    value: code,
+    label: name
+  }));
+};
+
+// Helper to get all countries that have language mappings
+export const getAllCountries = () => {
+  const countryNames: Record<string, string> = {
+    'BR': 'Brazil',
+    'US': 'United States',
+    'CA': 'Canada',
+    'MX': 'Mexico',
+    'FR': 'France',
+    'GB': 'United Kingdom',
+    'DE': 'Germany',
+    'JP': 'Japan',
+    'AU': 'Australia'
+  };
+
+  return Object.entries(countryNames).map(([code, name]) => ({
+    value: code,
+    label: name
+  }));
+};
