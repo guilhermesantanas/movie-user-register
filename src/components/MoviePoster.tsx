@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import RatingStars from '@/components/RatingStars';
 import { showToast } from '@/utils/toastUtils';
 
@@ -22,6 +22,9 @@ const MoviePoster = ({
   userLoggedIn,
   onRateMovie 
 }: MoviePosterProps) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  
   // Convert 10-scale rating to 5-scale for display
   const displayRating = averageRating / 2;
   
@@ -40,14 +43,34 @@ const MoviePoster = ({
       showToast.error("An error occurred while submitting your rating");
     }
   };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+  };
   
   return (
     <div className="md:col-span-1">
-      <div className="relative rounded-lg overflow-hidden shadow-lg">
+      <div className="relative rounded-lg overflow-hidden shadow-lg bg-muted">
+        {imageLoading && (
+          <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+            <div className="text-muted-foreground">Loading...</div>
+          </div>
+        )}
+        
         <img 
-          src={posterUrl || '/placeholder.svg'} 
-          alt={title} 
-          className="w-full h-auto object-cover"
+          src={imageError ? '/placeholder.svg' : (posterUrl || '/placeholder.svg')} 
+          alt={`${title} movie poster`}
+          className={`w-full h-auto object-cover transition-opacity duration-300 ${
+            imageLoading ? 'opacity-0' : 'opacity-100'
+          }`}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          loading="lazy"
         />
       </div>
 

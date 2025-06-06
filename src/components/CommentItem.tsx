@@ -44,46 +44,64 @@ const CommentItem = ({ comment, user, isAdmin, onDeleteComment }: CommentItemPro
     return colors[Math.abs(hash) % colors.length];
   };
 
+  const canDeleteComment = user && (isAdmin || user.id === comment.user_id);
+
   return (
-    <div className="p-4 border rounded-md bg-card">
+    <article className="p-4 border rounded-md bg-card" role="article" aria-labelledby={`comment-${comment.id}`}>
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
-          <Avatar className={comment.avatar_url ? '' : getAvatarColor(comment.user_name)}>
+          <Avatar className={comment.avatar_url ? '' : getAvatarColor(comment.user_name)} aria-hidden="true">
             {comment.avatar_url ? (
-              <AvatarImage src={comment.avatar_url} alt={comment.user_name} />
+              <AvatarImage 
+                src={comment.avatar_url} 
+                alt={`${comment.user_name}'s avatar`}
+                onError={(e) => {
+                  // Fallback if image fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             ) : null}
             <AvatarFallback>{getInitials(comment.user_name)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <p className="font-medium">{comment.user_name}</p>
+              <h4 id={`comment-${comment.id}`} className="font-medium">{comment.user_name}</h4>
               {comment.user_id === user?.id && isAdmin && (
-                <span className="text-[#FEF7CD] text-xs flex items-center">
-                  <Shield size={12} className="mr-1" />
+                <span className="text-[#FEF7CD] text-xs flex items-center" aria-label="Admin user">
+                  <Shield size={12} className="mr-1" aria-hidden="true" />
                   Admin
                 </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <time 
+              className="text-xs text-muted-foreground"
+              dateTime={comment.created_at}
+              title={new Date(comment.created_at).toLocaleString()}
+            >
               {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-            </p>
+            </time>
           </div>
         </div>
         
-        {user && (isAdmin || user.id === comment.user_id) && (
+        {canDeleteComment && (
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onDeleteComment(comment.id, comment.user_id)}
             className="text-destructive hover:text-destructive"
+            aria-label={`Delete comment by ${comment.user_name}`}
           >
-            <Trash2 size={16} />
+            <Trash2 size={16} aria-hidden="true" />
           </Button>
         )}
       </div>
       
-      <p className="mt-3 text-sm whitespace-pre-line">{comment.content}</p>
-    </div>
+      <div className="mt-3">
+        <p className="text-sm whitespace-pre-line" aria-describedby={`comment-${comment.id}`}>
+          {comment.content}
+        </p>
+      </div>
+    </article>
   );
 };
 
