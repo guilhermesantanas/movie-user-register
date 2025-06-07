@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare, Pin, Shield, User, Info } from 'lucide-react';
@@ -9,168 +8,26 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { ForumTopic, ForumCategory, OnlineUser, RecentPost } from '@/types/forum';
+import { useForumCategories } from '@/hooks/useForumCategories';
+import { useForumTopics, DatabaseForumTopic } from '@/hooks/useForumTopics';
+import { useForumReplies } from '@/hooks/useForumReplies';
 import ForumCategoryComponent from '@/components/forum/ForumCategory';
 import OnlineUsers from '@/components/forum/OnlineUsers';
 import RecentPosts from '@/components/forum/RecentPosts';
 
 // Forum categories and topics data
-const forumCategories: ForumCategory[] = [
-  {
-    id: 'rules',
-    name: 'Regras e Anúncios',
-    description: 'Informações importantes sobre o funcionamento do fórum',
-    topics: [
-      {
-        id: 0,
-        title: 'Regras do Fórum - Leia antes de postar',
-        author: 'Administrador',
-        authorType: 'admin',
-        replies: 0,
-        lastActivity: '2024-05-01T10:00:00',
-        isPinned: true,
-        isRules: true,
-        avatar_url: 'https://i.pravatar.cc/150?u=admin',
-        category: 'rules'
-      },
-      {
-        id: 5,
-        title: 'Atualizações da plataforma - Maio 2024',
-        author: 'Administrador',
-        authorType: 'admin',
-        replies: 3,
-        lastActivity: '2024-05-20T16:45:00',
-        isPinned: true,
-        avatar_url: 'https://i.pravatar.cc/150?u=admin',
-        category: 'rules'
-      }
-    ]
-  },
-  {
-    id: 'directors',
-    name: 'Diretores',
-    description: 'Discussões sobre diretores de cinema e seus trabalhos',
-    topics: [
-      {
-        id: 6,
-        title: 'Martin Scorsese - Retrospectiva',
-        author: 'Lucas Mendes',
-        authorType: 'moderator',
-        replies: 42,
-        lastActivity: '2024-05-21T14:30:00',
-        isPinned: true,
-        avatar_url: 'https://i.pravatar.cc/150?u=lucas',
-        category: 'directors'
-      },
-      {
-        id: 7,
-        title: 'Diretores brasileiros contemporâneos',
-        author: 'Ana Souza',
-        authorType: 'user',
-        replies: 18,
-        lastActivity: '2024-05-19T09:45:00',
-        isPinned: false,
-        avatar_url: 'https://i.pravatar.cc/150?u=ana',
-        category: 'directors'
-      },
-      {
-        id: 8,
-        title: 'Christopher Nolan - Técnicas de filmagem',
-        author: 'Paulo Ramos',
-        authorType: 'user',
-        replies: 24,
-        lastActivity: '2024-05-18T11:20:00',
-        isPinned: false,
-        avatar_url: 'https://i.pravatar.cc/150?u=paulo',
-        category: 'directors'
-      }
-    ]
-  },
-  {
-    id: 'actors',
-    name: 'Atores e Atrizes',
-    description: 'Discussões sobre atuações e carreiras de artistas',
-    topics: [
-      {
-        id: 9,
-        title: 'Melhores atuações de 2023',
-        author: 'Fernanda Lima',
-        authorType: 'moderator',
-        replies: 31,
-        lastActivity: '2024-05-20T16:15:00',
-        isPinned: true,
-        avatar_url: 'https://i.pravatar.cc/150?u=fernanda',
-        category: 'actors'
-      },
-      {
-        id: 10,
-        title: 'Wagner Moura - De Tropa de Elite a Hollywood',
-        author: 'Carlos Oliveira',
-        authorType: 'user',
-        replies: 27,
-        lastActivity: '2024-05-17T08:30:00',
-        isPinned: false,
-        avatar_url: 'https://i.pravatar.cc/150?u=carlos',
-        category: 'actors'
-      }
-    ]
-  },
-  {
-    id: 'genres',
-    name: 'Gêneros Cinematográficos',
-    description: 'Debates sobre diferentes gêneros de filmes',
-    topics: [
-      {
-        id: 11,
-        title: 'O renascimento do Terror psicológico',
-        author: 'Maria Silva',
-        authorType: 'user',
-        replies: 36,
-        lastActivity: '2024-05-22T10:10:00',
-        isPinned: true,
-        avatar_url: 'https://i.pravatar.cc/150?u=maria',
-        category: 'genres'
-      },
-      {
-        id: 12,
-        title: 'Cinema Noir brasileiro',
-        author: 'João Costa',
-        authorType: 'moderator',
-        replies: 14,
-        lastActivity: '2024-05-15T13:45:00',
-        isPinned: false,
-        avatar_url: 'https://i.pravatar.cc/150?u=joao',
-        category: 'genres'
-      },
-      {
-        id: 13,
-        title: 'A evolução da comédia no cinema nacional',
-        author: 'Camila Santos',
-        authorType: 'user',
-        replies: 22,
-        lastActivity: '2024-05-16T17:30:00',
-        isPinned: false,
-        avatar_url: 'https://i.pravatar.cc/150?u=camila',
-        category: 'genres'
-      }
-    ]
-  }
+const onlineUsers = [
+  { id: 1, name: 'Administrador', userType: 'admin' as const, avatar_url: 'https://i.pravatar.cc/150?u=admin', lastActive: new Date().toISOString() },
+  { id: 2, name: 'João Costa', userType: 'moderator' as const, avatar_url: 'https://i.pravatar.cc/150?u=joao', lastActive: new Date().toISOString() },
+  { id: 3, name: 'Maria Silva', userType: 'user' as const, avatar_url: 'https://i.pravatar.cc/150?u=maria', lastActive: new Date().toISOString() },
+  { id: 4, name: 'Carlos Oliveira', userType: 'user' as const, avatar_url: 'https://i.pravatar.cc/150?u=carlos', lastActive: new Date().toISOString() },
+  { id: 5, name: 'Ana Souza', userType: 'user' as const, avatar_url: 'https://i.pravatar.cc/150?u=ana', lastActive: new Date().toISOString() },
+  { id: 6, name: 'Lucas Mendes', userType: 'moderator' as const, avatar_url: 'https://i.pravatar.cc/150?u=lucas', lastActive: new Date().toISOString() },
+  { id: 7, name: 'Fernanda Lima', userType: 'user' as const, avatar_url: 'https://i.pravatar.cc/150?u=fernanda', lastActive: new Date().toISOString() },
+  { id: 8, name: 'Paulo Ramos', userType: 'user' as const, avatar_url: 'https://i.pravatar.cc/150?u=paulo', lastActive: new Date().toISOString() },
 ];
 
-// Online users data
-const onlineUsers: OnlineUser[] = [
-  { id: 1, name: 'Administrador', userType: 'admin', avatar_url: 'https://i.pravatar.cc/150?u=admin', lastActive: new Date().toISOString() },
-  { id: 2, name: 'João Costa', userType: 'moderator', avatar_url: 'https://i.pravatar.cc/150?u=joao', lastActive: new Date().toISOString() },
-  { id: 3, name: 'Maria Silva', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=maria', lastActive: new Date().toISOString() },
-  { id: 4, name: 'Carlos Oliveira', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=carlos', lastActive: new Date().toISOString() },
-  { id: 5, name: 'Ana Souza', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=ana', lastActive: new Date().toISOString() },
-  { id: 6, name: 'Lucas Mendes', userType: 'moderator', avatar_url: 'https://i.pravatar.cc/150?u=lucas', lastActive: new Date().toISOString() },
-  { id: 7, name: 'Fernanda Lima', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=fernanda', lastActive: new Date().toISOString() },
-  { id: 8, name: 'Paulo Ramos', userType: 'user', avatar_url: 'https://i.pravatar.cc/150?u=paulo', lastActive: new Date().toISOString() },
-];
-
-// Recent posts data
-const recentPosts: RecentPost[] = [
+const recentPosts = [
   {
     id: 1, 
     content: 'Acho que o trabalho dele em "Ilha do Medo" é subestimado. A forma como ele constrói tensão é incrível!', 
@@ -214,32 +71,76 @@ const recentPosts: RecentPost[] = [
 ];
 
 const Forum = () => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState<ForumTopic | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<DatabaseForumTopic | null>(null);
+  const [newReply, setNewReply] = useState('');
+  
+  const { categories, loading: categoriesLoading } = useForumCategories();
+  const { topics, loading: topicsLoading } = useForumTopics();
+  const { replies, loading: repliesLoading, addReply } = useForumReplies(selectedTopic?.id || '');
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR');
   };
   
+  // Transform database categories and topics to match the existing interface
+  const transformedCategories = categories.map(category => {
+    const categoryTopics = topics
+      .filter(topic => topic.category_id === category.id)
+      .map(topic => ({
+        id: parseInt(topic.id, 16) || Math.random(), // Convert UUID to number for compatibility
+        title: topic.title,
+        author: topic.profiles?.name || 'Usuário Anônimo',
+        authorType: (topic.profiles?.user_type || 'user') as 'user' | 'moderator' | 'admin',
+        replies: topic.reply_count || 0,
+        lastActivity: topic.last_activity || topic.updated_at,
+        isPinned: topic.is_pinned || false,
+        isRules: topic.title.toLowerCase().includes('regras'),
+        avatar_url: topic.profiles?.avatar_url || undefined,
+        category: category.name
+      }));
+
+    return {
+      id: category.id,
+      name: category.name,
+      description: category.description || '',
+      topics: categoryTopics
+    };
+  });
+  
   // Filter topics based on search query
   const filteredCategories = searchQuery
-    ? forumCategories.map(category => ({
+    ? transformedCategories.map(category => ({
         ...category,
         topics: category.topics.filter(topic => 
           topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           topic.author.toLowerCase().includes(searchQuery.toLowerCase())
         )
       })).filter(category => category.topics.length > 0)
-    : forumCategories;
+    : transformedCategories;
     
-  const handleTopicClick = (topic: ForumTopic) => {
-    setSelectedTopic(topic);
+  const handleTopicClick = (topic: any) => {
+    // Find the corresponding database topic
+    const dbTopic = topics.find(t => t.title === topic.title);
+    if (dbTopic) {
+      setSelectedTopic(dbTopic);
+    }
   };
 
   const handleBack = () => {
     setSelectedTopic(null);
+    setNewReply('');
+  };
+  
+  const handleReplySubmit = async () => {
+    if (!newReply.trim()) return;
+    
+    const success = await addReply(newReply);
+    if (success) {
+      setNewReply('');
+    }
   };
   
   const getInitials = (name: string) => {
@@ -256,7 +157,6 @@ const Forum = () => {
       'bg-pink-500', 'bg-teal-500'
     ];
     
-    // Simple hash function to determine color
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -266,6 +166,10 @@ const Forum = () => {
   };
   
   if (selectedTopic) {
+    const authorName = selectedTopic.profiles?.name || 'Usuário Anônimo';
+    const authorType = (selectedTopic.profiles?.user_type || 'user') as 'user' | 'moderator' | 'admin';
+    const isRulesPost = selectedTopic.title.toLowerCase().includes('regras');
+    
     return (
       <motion.div 
         className="container mx-auto px-4 py-6"
@@ -282,24 +186,24 @@ const Forum = () => {
             <div className="flex flex-wrap gap-2 justify-between items-start">
               <div className="flex-grow">
                 <CardTitle className="text-2xl flex items-center gap-2">
-                  {selectedTopic.isPinned && <Pin size={16} className="text-primary" />}
+                  {selectedTopic.is_pinned && <Pin size={16} className="text-primary" />}
                   {selectedTopic.title}
                 </CardTitle>
                 <div className="flex items-center gap-2 mt-2">
-                  <Avatar className={selectedTopic.avatar_url ? '' : getAvatarColor(selectedTopic.author, selectedTopic.authorType)}>
-                    {selectedTopic.avatar_url ? (
-                      <AvatarImage src={selectedTopic.avatar_url} alt={selectedTopic.author} />
+                  <Avatar className={selectedTopic.profiles?.avatar_url ? '' : getAvatarColor(authorName, authorType)}>
+                    {selectedTopic.profiles?.avatar_url ? (
+                      <AvatarImage src={selectedTopic.profiles.avatar_url} alt={authorName} />
                     ) : null}
-                    <AvatarFallback>{getInitials(selectedTopic.author)}</AvatarFallback>
+                    <AvatarFallback>{getInitials(authorName)}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
                     <div className="flex items-center">
-                      {selectedTopic.authorType === 'admin' ? (
+                      {authorType === 'admin' ? (
                         <Badge variant="default" className="flex items-center gap-1">
                           <Shield size={12} />
                           Admin
                         </Badge>
-                      ) : selectedTopic.authorType === 'moderator' ? (
+                      ) : authorType === 'moderator' ? (
                         <Badge variant="secondary" className="flex items-center gap-1">
                           <Shield size={12} />
                           Moderador
@@ -310,10 +214,10 @@ const Forum = () => {
                           Usuário
                         </Badge>
                       )}
-                      <span className="ml-2 text-sm">{selectedTopic.author}</span>
+                      <span className="ml-2 text-sm">{authorName}</span>
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      Atualizado em {formatDate(selectedTopic.lastActivity)}
+                      Criado em {formatDate(selectedTopic.created_at)}
                     </span>
                   </div>
                 </div>
@@ -322,7 +226,7 @@ const Forum = () => {
           </CardHeader>
           
           <CardContent>
-            {selectedTopic.isRules ? (
+            {isRulesPost ? (
               <div className="space-y-4">
                 <Alert className="bg-primary/5 border-primary/20">
                   <Info className="h-4 w-4 text-primary" />
@@ -362,36 +266,72 @@ const Forum = () => {
                 </div>
                 
                 <p className="italic text-muted-foreground text-center mt-6">
-                  Estas regras podem ser atualizadas periodicamente. Última atualização: 01/05/2024
+                  Estas regras podem ser atualizadas periodicamente. Última atualização: {formatDate(selectedTopic.updated_at)}
                 </p>
               </div>
             ) : (
               <>
-                <p className="text-muted-foreground">
-                  {selectedTopic.authorType === 'admin' ? (
-                    'Este é um tópico oficial da administração. Apenas administradores podem responder.'
-                  ) : (
-                    'Conteúdo do tópico...'
-                  )}
-                </p>
+                <div className="whitespace-pre-line text-muted-foreground">
+                  {selectedTopic.content || 'Conteúdo do tópico...'}
+                </div>
+                
                 <div className="mt-6 border-t pt-4">
-                  <p className="text-sm mb-2">Respostas ({selectedTopic.replies})</p>
-                  {selectedTopic.replies === 0 ? (
+                  <p className="text-sm mb-4">Respostas ({replies.length})</p>
+                  
+                  {repliesLoading ? (
+                    <p className="text-muted-foreground">Carregando respostas...</p>
+                  ) : replies.length === 0 ? (
                     <p className="text-muted-foreground">Nenhuma resposta ainda.</p>
                   ) : (
-                    <p className="text-muted-foreground">Carregando respostas...</p>
+                    <div className="space-y-4">
+                      {replies.map((reply) => (
+                        <Card key={reply.id} className="bg-muted/30">
+                          <CardContent className="pt-4">
+                            <div className="flex items-start gap-3">
+                              <Avatar className={reply.profiles?.avatar_url ? '' : getAvatarColor(reply.profiles?.name || 'Anônimo', (reply.profiles?.user_type || 'user') as any)}>
+                                {reply.profiles?.avatar_url ? (
+                                  <AvatarImage src={reply.profiles.avatar_url} alt={reply.profiles?.name || 'Anônimo'} />
+                                ) : null}
+                                <AvatarFallback>{getInitials(reply.profiles?.name || 'Anônimo')}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-medium">{reply.profiles?.name || 'Usuário Anônimo'}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDate(reply.created_at)}
+                                  </span>
+                                </div>
+                                <p className="text-sm whitespace-pre-line">{reply.content}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   )}
                   
-                  {selectedTopic.authorType !== 'admin' && (
+                  {user && !selectedTopic.is_locked && (
                     <div className="mt-6">
                       <p className="text-sm mb-2">Responder:</p>
                       <textarea
                         className="w-full border rounded-md p-2 min-h-[100px]"
                         placeholder="Digite sua resposta..."
+                        value={newReply}
+                        onChange={(e) => setNewReply(e.target.value)}
                       />
                       <div className="mt-2 flex justify-end">
-                        <Button>Enviar Resposta</Button>
+                        <Button onClick={handleReplySubmit} disabled={!newReply.trim()}>
+                          Enviar Resposta
+                        </Button>
                       </div>
+                    </div>
+                  )}
+                  
+                  {!user && (
+                    <div className="mt-6 p-4 bg-muted rounded-md">
+                      <p className="text-sm text-muted-foreground text-center">
+                        Faça login para participar da discussão
+                      </p>
                     </div>
                   )}
                 </div>
@@ -399,6 +339,24 @@ const Forum = () => {
             )}
           </CardContent>
         </Card>
+      </motion.div>
+    );
+  }
+  
+  if (categoriesLoading || topicsLoading) {
+    return (
+      <motion.div 
+        className="container mx-auto px-4 py-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2">
+            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+            Carregando fórum...
+          </div>
+        </div>
       </motion.div>
     );
   }
@@ -430,8 +388,8 @@ const Forum = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full md:w-64"
               />
-              <Button>
-                Novo Tópico
+              <Button disabled={!user}>
+                {user ? 'Novo Tópico' : 'Faça Login'}
               </Button>
             </div>
           </div>
@@ -441,7 +399,7 @@ const Forum = () => {
               <Info className="h-4 w-4 text-primary" />
               <AlertTitle>Bem-vindo ao Fórum</AlertTitle>
               <AlertDescription>
-                Por favor, leia as regras do fórum antes de participar. Os tópicos dos administradores são somente para informações importantes.
+                Por favor, leia as regras do fórum antes de participar. {!user && "Faça login para participar das discussões."}
               </AlertDescription>
             </Alert>
           </div>
