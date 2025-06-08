@@ -29,7 +29,7 @@ export const useForumReplies = (topicId: string) => {
         .from('forum_replies')
         .select(`
           *,
-          profiles!forum_replies_author_id_fkey (
+          profiles (
             name,
             avatar_url,
             user_type

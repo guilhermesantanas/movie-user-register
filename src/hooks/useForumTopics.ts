@@ -34,7 +34,7 @@ export const useForumTopics = (categoryId?: string) => {
         .from('forum_topics')
         .select(`
           *,
-          profiles!forum_topics_author_id_fkey (
+          profiles (
             name,
             avatar_url,
             user_type
