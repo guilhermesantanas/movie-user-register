@@ -150,6 +150,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "forum_replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "forum_replies_topic_id_fkey"
             columns: ["topic_id"]
             isOneToOne: false
@@ -193,6 +200,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "forum_topics_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "forum_topics_category_id_fkey"
             columns: ["category_id"]
